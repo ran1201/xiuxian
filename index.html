@@ -26,31 +26,33 @@
         }
         #app {
             width: 95%;
-            max-width: 500px;
+            max-width: 450px;
             height: 90vh;
             background: var(--card);
-            padding: 15px;
+            padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8), 0 0 5px var(--pink);
+            box-shadow: 0 0 25px rgba(0,0,0,0.9), 0 0 5px var(--pink);
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
         .header {
             text-align: center;
-            font-size: 20px;
+            font-size: 24px;
             color: var(--pink);
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             border-bottom: 1px solid var(--border);
-            text-shadow: 0 0 5px var(--pink);
+            text-shadow: 0 0 10px var(--pink);
+            margin-bottom: 15px;
         }
         /* 导航栏 */
         .tabs {
             display: flex;
             justify-content: space-around;
-            margin: 10px 0;
+            margin-bottom: 15px;
             background: #222;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 5px;
         }
         .tab-btn {
@@ -59,11 +61,15 @@
             color: #888;
             cursor: pointer;
             font-size: 14px;
-            padding: 5px 10px;
+            padding: 8px 12px;
+            flex: 1;
+            transition: 0.3s;
         }
         .tab-btn.active {
             color: var(--pink);
             font-weight: bold;
+            background: #111;
+            border-radius: 5px;
         }
 
         /* 界面切换 */
@@ -73,43 +79,48 @@
         .input-group { margin-bottom: 10px; }
         input, select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: #000;
             border: 1px solid #444;
             color: white;
-            border-radius: 5px;
+            border-radius: 8px;
             box-sizing: border-box;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            outline: none;
         }
+        input:focus { border-color: var(--pink); }
         button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: var(--pink);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 16px;
         }
+        button:hover { opacity: 0.8; box-shadow: 0 0 10px var(--pink); }
         
         .list-box {
             flex: 1;
             overflow-y: auto;
             background: #000;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 10px;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
             border: 1px solid var(--border);
         }
         .item {
-            padding: 8px;
+            padding: 10px;
             border-bottom: 1px solid #222;
             font-size: 14px;
+            line-height: 1.6;
         }
-        .item-name { color: var(--pink); font-weight: bold; }
-        .item-meta { color: #666; font-size: 12px; }
+        .item-name { color: var(--pink); font-weight: bold; cursor: pointer; }
+        .item-meta { color: #777; font-size: 12px; margin-left: 5px; }
 
-        #admin-tag { background: var(--pink); color: black; font-size: 10px; padding: 1px 3px; border-radius: 3px; margin-right: 3px; }
+        #admin-tag { background: var(--pink); color: black; font-size: 11px; padding: 2px 5px; border-radius: 4px; margin-right: 5px; font-weight: bold; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -121,64 +132,60 @@
     <!-- 登录注册面板 -->
     <div id="auth-panel" class="panel active">
         <div id="login-form">
-            <input type="text" id="l-name" placeholder="道号">
-            <input type="password" id="l-pw" placeholder="密匙">
+            <div class="input-group"><input type="text" id="l-name" placeholder="道号"></div>
+            <div class="input-group"><input type="password" id="l-pw" placeholder="神魂密匙"></div>
             <button onclick="login()">契合神魂</button>
-            <p style="text-align:center; font-size:12px; color:#888;" onclick="toggleAuth(true)">初次降生？点此刻画神魂</p>
+            <p style="text-align:center; font-size:14px; color:#888; cursor:pointer; margin-top:15px;" onclick="toggleAuth(true)">初次降生？点此刻画神魂</p>
         </div>
         <div id="reg-form" style="display:none;">
-            <input type="text" id="r-qq" placeholder="感应QQ">
-            <input type="text" id="r-name" placeholder="起个道号">
-            <input type="password" id="r-pw" placeholder="设置密匙">
+            <div class="input-group"><input type="text" id="r-qq" placeholder="感应QQ"></div>
+            <div class="input-group"><input type="text" id="r-name" placeholder="起个道号"></div>
+            <div class="input-group"><input type="password" id="r-pw" placeholder="设置神魂密匙"></div>
             <button onclick="register()">刻画神魂</button>
-            <p style="text-align:center; font-size:12px; color:#888;" onclick="toggleAuth(false)">已有神魂？点此归位</p>
+            <p style="text-align:center; font-size:14px; color:#888; cursor:pointer; margin-top:15px;" onclick="toggleAuth(false)">已有神魂？点此归位</p>
         </div>
     </div>
 
     <!-- 核心游戏面板 -->
     <div id="game-panel" class="panel">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('world')">诸天</button>
-            <button class="tab-btn" onclick="switchTab('private')">密语</button>
-            <button class="tab-btn" onclick="switchTab('sect')">宗门</button>
-            <button class="tab-btn" onclick="switchTab('friends')">道友</button>
+            <button class="tab-btn active" id="btn-world" onclick="switchTab('world')">诸天</button>
+            <button class="tab-btn" id="btn-private" onclick="switchTab('private')">密语</button>
+            <button class="tab-btn" id="btn-sect" onclick="switchTab('sect')">宗门</button>
+            <button class="tab-btn" id="btn-friends" onclick="switchTab('friends')">道友</button>
         </div>
 
-        <!-- 诸天大厅 -->
         <div id="tab-world" class="tab-content" style="display:flex; flex-direction:column; height:100%;">
             <div class="list-box" id="world-msgs"></div>
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="world-input" placeholder="传音诸天...">
-                <button style="width:70px;" onclick="sendWorldMsg()">传音</button>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="world-input" placeholder="传音诸天..." style="margin:0;">
+                <button style="width:80px;" onclick="sendWorldMsg()">传音</button>
             </div>
         </div>
 
-        <!-- 私人密语 -->
         <div id="tab-private" class="tab-content" style="display:none; flex-direction:column; height:100%;">
-            <select id="msg-to" style="margin-bottom:5px;"></select>
+            <select id="msg-to" style="margin-bottom:10px;"></select>
             <div class="list-box" id="private-msgs"></div>
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="private-input" placeholder="神识传音...">
-                <button style="width:70px;" onclick="sendPrivateMsg()">私传</button>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="private-input" placeholder="神识传音..." style="margin:0;">
+                <button style="width:80px;" onclick="sendPrivateMsg()">私传</button>
             </div>
         </div>
 
-        <!-- 宗门系统 -->
         <div id="tab-sect" class="tab-content" style="display:none; flex-direction:column; height:100%;">
-            <div id="sect-info" style="margin-bottom:10px; font-size:14px; color:var(--gold);"></div>
+            <div id="sect-info" style="margin-bottom:15px; font-size:14px; color:var(--gold); font-weight:bold;"></div>
             <div class="list-box" id="sect-list"></div>
             <div id="sect-ops">
-                <input type="text" id="sect-name" placeholder="宗门名称">
+                <input type="text" id="sect-name" placeholder="输入新宗门名号">
                 <button onclick="createSect()">开宗立派</button>
             </div>
         </div>
 
-        <!-- 道友录 -->
         <div id="tab-friends" class="tab-content" style="display:none; flex-direction:column; height:100%;">
             <div class="list-box" id="player-list"></div>
-            <div style="font-size:12px; color:#666;">* 点击道友名称可发起私信</div>
-            <button style="margin-top:10px; background:#444;" onclick="updatePasswordUI()">重刻神魂密匙</button>
-            <button style="margin-top:10px; background:#222;" onclick="location.reload()">离线闭关</button>
+            <div style="font-size:12px; color:#666; margin-bottom:10px;">* 点击道友名称可直接发起私传密语</div>
+            <button style="background:#444; margin-bottom:10px;" onclick="updatePasswordUI()">重刻神魂密匙</button>
+            <button style="background:#222;" onclick="location.reload()">离线闭关</button>
         </div>
     </div>
 </div>
@@ -186,35 +193,53 @@
 <script>
     const SB_URL = 'https://fjnpzauputcotjvmrytq.supabase.co';
     const SB_KEY = 'sb_publishable_YZdfwigTvkCDB-XHmf4VOw_tgLN2NCc';
-    const supabase = supabase.createClient(SB_URL, SB_KEY);
+    
+    // 使用不同命名的客户端防止冲突
+    const _db = supabase.createClient(SB_URL, SB_KEY);
 
     let me = null;
 
     function toggleAuth(isReg) {
         document.getElementById('login-form').style.display = isReg ? 'none' : 'block';
         document.getElementById('reg-form').style.display = isReg ? 'block' : 'none';
+        document.getElementById('main-title').innerText = isReg ? "诸天 · 降生" : "诸天万界";
     }
 
     async function register() {
-        const qq = document.getElementById('r-qq').value;
-        const name = document.getElementById('r-name').value;
-        const pw = document.getElementById('r-pw').value;
-        if(!qq || !name || !pw) return alert('神魂不全');
-        const { error } = await supabase.from('players').insert([{ qq, name, password: pw, level: 1, money: 100 }]);
-        if(!error) { alert('降生成功'); toggleAuth(false); }
-        else alert('降生失败：' + error.message);
+        const qq = document.getElementById('r-qq').value.trim();
+        const name = document.getElementById('r-name').value.trim();
+        const pw = document.getElementById('r-pw').value.trim();
+        
+        if(!qq || !name || !pw) return alert('神魂不全，无法感应天道');
+        
+        const { error } = await _db.from('players').insert([{ qq, name, password: pw, level: 1, money: 100 }]);
+        if(!error) { 
+            alert('刻画成功，请点击“已有神魂”进行归位'); 
+            toggleAuth(false); 
+        } else {
+            alert('降生失败：' + error.message);
+        }
     }
 
     async function login() {
-        const name = document.getElementById('l-name').value;
-        const pw = document.getElementById('l-pw').value;
+        const name = document.getElementById('l-name').value.trim();
+        const pw = document.getElementById('l-pw').value.trim();
+        
+        if(!name || !pw) return alert('请输入道号与密匙');
+
+        // 主宰 Ran 特权判定
         if(name === 'Ran' && pw === 'mr081104') {
             enterGame({ name: 'Ran', level: 999, money: 99999, sect: '天道' });
             return;
         }
-        const { data } = await supabase.from('players').select('*').eq('name', name).eq('password', pw).single();
-        if(data) enterGame(data);
-        else alert('神魂不匹配');
+
+        const { data, error } = await _db.from('players').select('*').eq('name', name).eq('password', pw).single();
+        
+        if(data) {
+            enterGame(data);
+        } else {
+            alert('神魂感应失败：道号不存在或密匙错误');
+        }
     }
 
     function enterGame(player) {
@@ -223,13 +248,14 @@
         document.getElementById('game-panel').classList.add('active');
         document.getElementById('main-title').innerText = "诸天 · " + me.name;
         
+        switchTab('world');
         loadWorldMsgs();
         loadSects();
         loadPlayers();
         
-        // 实时监听
-        supabase.channel('room1').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, p => appendWorld(p.new)).subscribe();
-        supabase.channel('room2').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'private_messages' }, p => {
+        // 开启实时监控法则
+        _db.channel('global_chat').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, p => appendWorld(p.new)).subscribe();
+        _db.channel('private_chat').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'private_messages' }, p => {
             if(p.new.receiver === me.name || p.new.sender === me.name) appendPrivate(p.new);
         }).subscribe();
     }
@@ -238,13 +264,15 @@
         document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + tab).style.display = 'flex';
-        event.target.classList.add('active');
+        document.getElementById('btn-' + tab).classList.add('active');
         if(tab === 'private') loadPrivateMsgs();
+        if(tab === 'friends') loadPlayers();
+        if(tab === 'sect') loadSects();
     }
 
-    // --- 诸天逻辑 ---
+    // --- 诸天大厅 ---
     async function loadWorldMsgs() {
-        const { data } = await supabase.from('messages').select('*').order('created_at', { ascending: false }).limit(30);
+        const { data } = await _db.from('messages').select('*').order('created_at', { ascending: false }).limit(40);
         const box = document.getElementById('world-msgs');
         box.innerHTML = '';
         if(data) data.reverse().forEach(m => appendWorld(m));
@@ -261,15 +289,16 @@
     }
 
     async function sendWorldMsg() {
-        const content = document.getElementById('world-input').value;
+        const input = document.getElementById('world-input');
+        const content = input.value.trim();
         if(!content) return;
-        await supabase.from('messages').insert([{ name: me.name, content }]);
-        document.getElementById('world-input').value = '';
+        await _db.from('messages').insert([{ name: me.name, content }]);
+        input.value = '';
     }
 
-    // --- 私信逻辑 ---
+    // --- 私信密语 ---
     async function loadPrivateMsgs() {
-        const { data } = await supabase.from('private_messages')
+        const { data } = await _db.from('private_messages')
             .select('*')
             .or(`sender.eq.${me.name},receiver.eq.${me.name}`)
             .order('created_at', { ascending: true });
@@ -283,56 +312,60 @@
         const div = document.createElement('div');
         div.className = 'item';
         const isMe = m.sender === me.name;
-        div.innerHTML = `<span style="color:${isMe?'#888':var(--pink)}">[${isMe?'传予'+m.receiver:m.sender+'传音'}]</span>: ${m.content}`;
+        const color = isMe ? '#888' : 'var(--pink)';
+        div.innerHTML = `<span style="color:${color}">[${isMe?'传予 '+m.receiver : m.sender+' 密语'}]</span>: ${m.content}`;
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
     }
 
     async function sendPrivateMsg() {
         const to = document.getElementById('msg-to').value;
-        const content = document.getElementById('private-input').value;
-        if(!to || !content) return;
-        await supabase.from('private_messages').insert([{ sender: me.name, receiver: to, content }]);
-        document.getElementById('private-input').value = '';
+        const input = document.getElementById('private-input');
+        const content = input.value.trim();
+        if(!to || !content) return alert('请选择道友并输入密语');
+        await _db.from('private_messages').insert([{ sender: me.name, receiver: to, content }]);
+        input.value = '';
     }
 
-    // --- 宗门逻辑 ---
+    // --- 宗门系统 ---
     async function loadSects() {
-        const { data } = await supabase.from('sects').select('*');
+        const { data } = await _db.from('sects').select('*');
         const box = document.getElementById('sect-list');
         box.innerHTML = '';
         if(data) data.forEach(s => {
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `<span class="item-name">${s.name}</span> <span class="item-meta">(宗主: ${s.leader})</span> 
-                             <button style="width:50px; padding:2px; font-size:10px; float:right;" onclick="joinSect('${s.name}')">加入</button>`;
+                             <button style="width:60px; padding:5px; font-size:12px; float:right; background:#333;" onclick="joinSect('${s.name}')">加入</button>`;
             box.appendChild(div);
         });
-        document.getElementById('sect-info').innerText = me.sect ? `所属宗门：${me.sect}` : "散修一名";
+        document.getElementById('sect-info').innerText = me.sect ? `当前所属：${me.sect}` : "当前身份：散修";
     }
 
     async function createSect() {
-        const name = document.getElementById('sect-name').value;
+        const name = document.getElementById('sect-name').value.trim();
         if(!name) return;
-        const { error } = await supabase.from('sects').insert([{ name, leader: me.name }]);
+        const { error } = await _db.from('sects').insert([{ name, leader: me.name }]);
         if(!error) {
-            await supabase.from('players').update({ sect: name }).eq('name', me.name);
+            await _db.from('players').update({ sect: name }).eq('name', me.name);
             me.sect = name;
             loadSects();
-        } else alert('创建失败，可能名号已被占用');
+            alert('宗门创建成功，你已成为一代宗主');
+        } else alert('创建失败：名号可能已被占用');
     }
 
     async function joinSect(sName) {
-        const { error } = await supabase.from('players').update({ sect: sName }).eq('name', me.name);
-        if(!error) { me.sect = sName; loadSects(); alert('已拜入' + sName); }
+        const { error } = await _db.from('players').update({ sect: sName }).eq('name', me.name);
+        if(!error) { me.sect = sName; loadSects(); alert('已成功拜入 ' + sName); }
     }
 
     // --- 道友录 ---
     async function loadPlayers() {
-        const { data } = await supabase.from('players').select('name, sect').limit(100);
+        const { data } = await _db.from('players').select('name, sect').limit(100);
         const box = document.getElementById('player-list');
         const sel = document.getElementById('msg-to');
         box.innerHTML = '';
+        const currentTo = sel.value;
         sel.innerHTML = '<option value="">选择传音对象...</option>';
         if(data) data.forEach(p => {
             if(p.name === me.name) return;
@@ -342,6 +375,7 @@
             box.appendChild(div);
             sel.innerHTML += `<option value="${p.name}">${p.name}</option>`;
         });
+        sel.value = currentTo;
     }
 
     function startPrivate(name) {
@@ -350,11 +384,13 @@
     }
 
     async function updatePasswordUI() {
-        const p = prompt("重刻神魂密匙：");
-        if(p && p.length > 2) {
-            await supabase.from('players').update({ password: p }).eq('name', me.name);
-            alert('修改成功，请重新闭关');
-            location.reload();
+        const p = prompt("请输入新的神魂密匙（至少3位）：");
+        if(p && p.length >= 3) {
+            const { error } = await _db.from('players').update({ password: p }).eq('name', me.name);
+            if(!error) {
+                alert('修改成功，请重新归位');
+                location.reload();
+            } else alert('修改失败：' + error.message);
         }
     }
 </script>
