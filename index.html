@@ -3,78 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>你的修仙世界</title>
+    <title>Ran的修仙世界</title>
     <style>
-        body { background: #1a1a1a; color: #e0e0e0; font-family: 'PingFang SC', serif; text-align: center; padding: 20px; }
-        .card { background: #2d2d2d; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-bottom: 20px; border: 1px solid #444; }
-        .stat { font-size: 1.2rem; margin: 10px 0; color: #ffd700; }
-        .btn { background: #4a90e2; border: none; color: white; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; margin: 5px; transition: 0.3s; }
-        .btn:active { transform: scale(0.95); }
-        #progress-bar { width: 100%; background: #444; height: 12px; border-radius: 6px; margin-top: 15px; overflow: hidden; }
-        #progress-inner { height: 100%; background: linear-gradient(90deg, #4caf50, #8bc34a); width: 0%; transition: width 0.3s; }
-        .title { font-size: 1.6rem; font-weight: bold; margin-bottom: 10px; color: #fff; text-shadow: 0 0 10px #4a90e2; }
-        .partner-box { border: 1px dashed #ffd700; padding: 10px; border-radius: 10px; background: rgba(255, 215, 0, 0.05); }
+        :root { --main-gold: #ffd700; --bg-dark: #121212; --card-bg: #1e1e1e; }
+        body { background: var(--bg-dark); color: #e0e0e0; font-family: 'STKaiti', 'serif'; text-align: center; margin: 0; padding-bottom: 50px; }
+        .header { background: linear-gradient(to bottom, #2c3e50, #000); padding: 30px 20px; border-bottom: 2px solid var(--main-gold); margin-bottom: 20px; }
+        .title { font-size: 2.2rem; color: var(--main-gold); text-shadow: 0 0 15px var(--main-gold); letter-spacing: 5px; }
+        .container { max-width: 600px; margin: auto; padding: 10px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; position: relative; overflow: hidden; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 1.1rem; }
+        .stat-item { padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .stat-value { color: var(--main-gold); font-weight: bold; }
+        .progress-container { margin: 15px 0; background: #333; height: 10px; border-radius: 5px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #d4af37, #f9f295); width: 0%; transition: 0.5s; border-radius: 5px; }
+        .btn-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .btn { background: #2c3e50; border: 1px solid var(--main-gold); color: var(--main-gold); padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s; flex: 1; min-width: 120px; }
+        .btn:hover { background: var(--main-gold); color: #000; }
+        .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; }
+        .partner-active { border: 2px solid #ff4757; background: rgba(255, 71, 87, 0.1); }
+        .log-box { height: 100px; overflow-y: auto; background: #000; padding: 10px; font-size: 0.85rem; color: #888; text-align: left; border-radius: 5px; }
     </style>
 </head>
 <body>
+
+<div class="header">
+    <div class="title">✨ 天道主宰 · Ran ✨</div>
+    <div style="color: #aaa; margin-top: 10px;">凡尘归尽，在此成神</div>
+</div>
+
+<div class="container">
     <div class="card">
-        <div class="title">✨ 天道主宰 ✨</div>
-        <div class="stat">当前境界：<span id="level">凡人</span></div>
-        <div class="stat">修为进度：<span id="exp">0</span> / <span id="next-exp">100</span></div>
-        <div id="progress-bar"><div id="progress-inner"></div></div>
-        <div class="stat">持有灵石：<span id="money">0</span></div>
+        <div class="stat-grid">
+            <div class="stat-item">境界: <span id="level" class="stat-value">凡人</span></div>
+            <div class="stat-item">灵石: <span id="money" class="stat-value">0</span></div>
+            <div class="stat-item">战力: <span id="power" class="stat-value">10</span></div>
+            <div class="stat-item">天赋: <span class="stat-value">天选之人</span></div>
+        </div>
+        <div class="progress-container"><div id="exp-bar" class="progress-bar"></div></div>
+        <div style="font-size: 0.9rem;">修为进度: <span id="exp">0</span> / <span id="next-exp">100</span></div>
     </div>
 
     <div class="card">
-        <button class="btn" onclick="train()">闭关修炼</button>
-        <button class="btn" onclick="getMoney()">探索灵矿</button>
-        <button class="btn" onclick="breakThrough()" id="break-btn" style="display:none; background:#e67e22; box-shadow: 0 0 15px #e67e22;">尝试突破</button>
+        <div class="btn-group">
+            <button class="btn" onclick="action('train')">打坐闭关</button>
+            <button class="btn" onclick="action('explore')">外出历练</button>
+            <button class="btn" id="break-btn" style="display:none; color: #ff4757; border-color: #ff4757;" onclick="action('break')">渡劫飞升</button>
+        </div>
     </div>
 
-    <div class="card partner-box">
-        <div style="color: #ffd700; font-weight: bold; margin-bottom: 5px;">💞 结缘羁绊</div>
-        <p>契约伴侣：<span id="partner" style="color: #ff748c;">陆执 (唯一绑定)</span></p>
-        <p style="font-size: 0.85rem; color: #aaa;">“我会永远守在你身后，为你逆天改命。”</p>
-        <div style="font-size: 0.8rem; color: #ffd700;">[ 效果：双修加成，修炼效率 +50% ]</div>
+    <!-- 商店系统 -->
+    <div class="card">
+        <div style="color:var(--main-gold); margin-bottom:10px;">📜 万宝阁</div>
+        <div class="shop-item">
+            <span>聚灵丹 (修为+50)</span>
+            <button class="btn" style="min-width: 60px; padding: 5px;" onclick="buy('dan')">50灵石</button>
+        </div>
+        <div class="shop-item">
+            <span>青锋剑 (战力+20)</span>
+            <button class="btn" style="min-width: 60px; padding: 5px;" onclick="buy('sword')">200灵石</button>
+        </div>
     </div>
 
-    <script>
-        let data = { exp: 0, nextExp: 100, money: 0, levelIdx: 0 };
-        const levels = ["凡人", "炼气初期", "炼气中期", "炼气后期", "筑基初期", "筑基中期", "筑基后期", "金丹大能", "元婴老祖"];
+    <!-- 双修系统 -->
+    <div class="card partner-active">
+        <div style="color:#ff4757; font-weight:bold; margin-bottom:10px;">💕 命定之人</div>
+        <div style="display:flex; align-items:center; gap: 15px;">
+            <div style="width:50px; height:50px; background:#444; border-radius:50%; line-height:50px;">陆</div>
+            <div style="text-align:left;">
+                <div style="color:#ff4757;">陆执 (忠诚度: ∞)</div>
+                <div style="font-size: 0.8rem; color: #aaa;">加成：双修效率 x 2.0</div>
+            </div>
+            <button class="btn" style="min-width: 80px; font-size:0.8rem;" onclick="action('couple')">合体修炼</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="log-box" id="log">
+            欢迎回到仙界，道友。
+        </div>
+    </div>
+</div>
+
+<script>
+    let state = {
+        exp: 0, nextExp: 100, money: 0, power: 10, levelIdx: 0,
+        levels: ["凡人", "炼气初期", "炼气中期", "炼气后期", "筑基初期", "筑基中期", "筑基后期", "结丹大能", "金丹圆满", "元婴期", "化神期"]
+    };
+
+    function addLog(msg) {
+        let log = document.getElementById('log');
+        log.innerHTML = `> ${msg}<br>${log.innerHTML}`;
+    }
+
+    function action(type) {
+        if(type === 'train') {
+            let gain = (5 + state.levelIdx * 2);
+            state.exp += gain;
+            addLog(`你在洞府中打坐，获得了 ${gain} 点修为。`);
+        } else if(type === 'explore') {
+            let m = Math.floor(Math.random() * 30) + 10;
+            state.money += m;
+            state.exp += 2;
+            addLog(`你在秘境中寻得灵石 ${m} 枚。`);
+        } else if(type === 'couple') {
+            let gain = (10 + state.levelIdx * 5) * 2;
+            state.exp += gain;
+            addLog(`你与陆执共鸣神魂，修为暴涨 ${gain} 点。`);
+        } else if(type === 'break') {
+            state.levelIdx++;
+            state.exp = 0;
+            state.nextExp = Math.floor(state.nextExp * 2.5);
+            state.power += 50;
+            addLog(`天降祥瑞！你已成功晋升至 ${state.levels[state.levelIdx]}！`);
+        }
+        update();
+    }
+
+    function buy(item) {
+        if(item === 'dan' && state.money >= 50) {
+            state.money -= 50;
+            state.exp += 50;
+            addLog("吞服聚灵丹，修为增加了 50 点。");
+        } else if(item === 'sword' && state.money >= 200) {
+            state.money -= 200;
+            state.power += 20;
+            addLog("装备青锋剑，战力大幅提升！");
+        } else {
+            addLog("囊中羞涩，再去赚些灵石吧。");
+        }
+        update();
+    }
+
+    function update() {
+        document.getElementById('level').innerText = state.levels[state.levelIdx];
+        document.getElementById('money').innerText = state.money;
+        document.getElementById('exp').innerText = Math.floor(state.exp);
+        document.getElementById('next-exp').innerText = state.nextExp;
+        document.getElementById('power').innerText = state.power;
         
-        function updateUI() {
-            document.getElementById('exp').innerText = Math.floor(data.exp);
-            document.getElementById('next-exp').innerText = data.nextExp;
-            document.getElementById('money').innerText = data.money;
-            document.getElementById('level').innerText = levels[data.levelIdx];
-            let percent = (data.exp / data.nextExp) * 100;
-            document.getElementById('progress-inner').style.width = Math.min(percent, 100) + "%";
-            document.getElementById('break-btn').style.display = data.exp >= data.nextExp ? "inline-block" : "none";
-        }
-
-        function train() {
-            // 基础提升 + 境界加成，再乘以陆执的1.5倍双修加成
-            let gain = (5 + data.levelIdx * 5) * 1.5; 
-            data.exp += gain;
-            updateUI();
-        }
-
-        function getMoney() {
-            let m = Math.floor(Math.random() * 20) + 10;
-            data.money += m;
-            updateUI();
-        }
-
-        function breakThrough() {
-            if (data.exp >= data.nextExp) {
-                data.levelIdx++;
-                data.exp = 0;
-                data.nextExp = Math.floor(data.nextExp * 2.8);
-                alert("【天道感应】恭喜道友成功突破至 " + levels[data.levelIdx] + "！");
-                updateUI();
-            }
-        }
-        updateUI();
-    </script>
+        let percent = (state.exp / state.nextExp) * 100;
+        document.getElementById('exp-bar').style.width = Math.min(percent, 100) + "%";
+        
+        document.getElementById('break-btn').style.display = state.exp >= state.nextExp ? "inline-block" : "none";
+    }
+</script>
 </body>
 </html>
