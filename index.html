@@ -3,236 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ran · 诸天万界 (宗门纪元)</title>
-    <!-- 引入天道核心库 (LeanCloud) -->
-    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.12.0/dist/av-min.js"></script>
+    <title>Ran · 诸天万界 (主宰版)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --gold: #ffd700; --bg: #0d0d0d; --card: #1a1a1a; --pink: #ff748c; }
-        body { background: var(--bg); color: #ddd; font-family: 'STKaiti', serif; margin: 0; }
-        .container { max-width: 500px; margin: auto; padding: 10px; }
-        .card { background: var(--card); border: 1px solid #333; border-radius: 12px; padding: 15px; margin-bottom: 10px; }
-        .btn { background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; border-radius: 5px; cursor: pointer; margin: 3px; }
-        .input-box { background: #000; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; width: 85%; margin: 5px 0; }
+        :root { --gold: #ffd700; --bg: #0a0a0a; --card: #151515; --pink: #ff748c; }
+        body { background: var(--bg); color: #ccc; font-family: 'STKaiti', serif; margin: 0; padding-bottom: 70px; }
+        .container { max-width: 500px; margin: auto; padding: 15px; }
+        .card { background: var(--card); border: 1px solid #222; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.8); }
+        .btn { background: #222; border: 1px solid var(--gold); color: var(--gold); padding: 8px 12px; border-radius: 5px; cursor: pointer; margin: 3px; font-size: 0.9rem; }
+        .input-box { background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; width: 85%; margin: 5px 0; }
         
-        /* 登录遮罩 */
-        #gate-screen { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        
-        /* 聊天系统 */
-        .chat-area { height: 300px; overflow-y: auto; background: #000; border: 1px solid #333; padding: 10px; font-size: 0.85rem; }
-        .msg-sys { color: var(--gold); font-weight: bold; margin: 5px 0; border-left: 3px solid var(--gold); padding-left: 5px; }
-        .msg-normal { margin: 5px 0; border-bottom: 1px solid #222; padding-bottom: 3px; }
-        
-        .tab-nav { display: flex; justify-content: space-around; background: #111; padding: 10px 0; border-top: 1px solid var(--gold); position: fixed; bottom: 0; width: 100%; max-width: 500px; }
-        .tab-btn { color: #888; font-size: 0.9rem; cursor: pointer; }
-        .tab-btn.active { color: var(--gold); font-weight: bold; }
-        
-        .broadcast-bar { background: rgba(255, 215, 0, 0.2); border: 1px solid var(--gold); color: var(--gold); padding: 5px; font-size: 0.8rem; height: 20px; overflow: hidden; white-space: nowrap; }
+        /* 登录注册切换 */
+        #auth-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .auth-tab { display: flex; margin-bottom: 20px; }
+        .tab-btn { color: #666; padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+        #broadcast { background: rgba(255, 215, 0, 0.1); color: var(--gold); padding: 5px 10px; font-size: 0.85rem; border-bottom: 1px solid var(--gold); }
+        .chat-box { height: 300px; overflow-y: auto; background: #000; padding: 10px; border-radius: 8px; font-size: 0.9rem; }
+        .nav { position: fixed; bottom: 0; width: 100%; max-width: 500px; background: #111; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; }
+        .nav-item { color: #666; cursor: pointer; }
+        .nav-item.active { color: var(--gold); }
     </style>
 </head>
 <body>
 
-<!-- 降临界面 -->
-<div id="gate-screen">
-    <h1 style="color:var(--gold); letter-spacing: 15px; text-shadow: 0 0 20px var(--gold);">诸天万界</h1>
-    <div id="login-panel">
-        <input type="number" id="qq-input" class="input-box" placeholder="绑定QQ号 (唯一凭证)">
-        <input type="text" id="name-input" class="input-box" placeholder="设定/输入道号">
-        <select id="gender-input" class="input-box" style="width:91%">
+<div id="auth-screen">
+    <h1 style="color:var(--gold); letter-spacing: 15px; margin-bottom:30px;">诸天万界</h1>
+    
+    <div class="auth-tab">
+        <div id="tab-login" class="tab-btn active" onclick="toggleAuth('login')">归位 (登录)</div>
+        <div id="tab-reg" class="tab-btn" onclick="toggleAuth('reg')">降生 (注册)</div>
+    </div>
+
+    <!-- 登录界面 -->
+    <div id="login-form" style="text-align:center; width: 100%;">
+        <input type="text" id="login-name" class="input-box" placeholder="输入道号">
+        <button class="btn" style="width:91%; margin-top:15px;" onclick="handleLogin()">破开虚空</button>
+    </div>
+
+    <!-- 注册界面 -->
+    <div id="reg-form" style="display:none; text-align:center; width: 100%;">
+        <input type="number" id="reg-qq" class="input-box" placeholder="绑定QQ号 (唯一凭证)">
+        <input type="text" id="reg-name" class="input-box" placeholder="设定道号">
+        <select id="reg-gender" class="input-box" style="width:91%">
             <option value="坤修">坤修 (女)</option>
             <option value="乾修">乾修 (男)</option>
         </select>
-        <button class="btn" style="width:91%; margin-top:10px;" onclick="gateOpen()">开启仙路</button>
+        <button class="btn" style="width:91%; margin-top:15px;" onclick="handleRegister()">注就神魂</button>
     </div>
 </div>
 
-<div class="container" id="world-ui" style="display:none; padding-bottom: 80px;">
-    <!-- 系统播报 -->
-    <div class="broadcast-bar" id="sys-announcement">【天道】欢迎降临诸天万界...</div>
+<div id="main-ui" style="display:none;">
+    <div id="broadcast">【天道】诸天祥瑞，欢迎降临...</div>
+    
+    <div class="container">
+        <!-- 个人面板 -->
+        <div id="page-profile">
+            <div class="card">
+                <div style="display:flex; justify-content:space-between;">
+                    <b style="font-size:1.2rem; color:var(--gold);" id="display-name">修士</b>
+                    <span id="admin-tag" style="display:none; color:var(--pink); border:1px solid var(--pink); padding:2px 5px; border-radius:4px; font-size:0.7rem;">天道主宰</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;">
+                    <span>境界: <b id="display-level" style="color:var(--gold)">凡人</b></span>
+                    <span>灵石: <b id="display-money">0</b></span>
+                    <span>宗门: <b id="display-sect">散修</b></span>
+                    <span>QQ: <b id="display-qq">--</b></span>
+                </div>
+            </div>
 
-    <!-- 个人档案 -->
-    <div class="card" id="profile-card">
-        <div style="display:flex; justify-content:space-between;">
-            <b id="u-name" style="font-size:1.2rem; color:var(--gold);">修士</b>
-            <span id="u-id" style="color:#666; font-size:0.7rem;">#ID</span>
+            <div class="card">
+                <div style="color:var(--gold); margin-bottom:12px;">🌟 仙途操作</div>
+                <button class="btn" onclick="action('train')">静坐闭关</button>
+                <button class="btn" onclick="action('explore')">秘境历练</button>
+                <button id="admin-btn" class="btn" style="display:none; border-color:var(--pink); color:var(--pink);" onclick="switchPage('admin')">管理天道</button>
+            </div>
         </div>
-        <div style="font-size:0.9rem; margin-top:10px; display:grid; grid-template-columns: 1fr 1fr;">
-            <span>境界: <b id="u-level" style="color:var(--gold)">凡人</b></span>
-            <span>灵石: <b id="u-money">0</b></span>
-            <span>战力: <b id="u-power">10</b></span>
-            <span>宗门: <b id="u-sect">散修</b></span>
-        </div>
-        <div style="font-size:0.8rem; color:var(--pink); margin-top:10px;">
-            道侣: <span id="u-partner">孤身一人</span>
-        </div>
-    </div>
 
-    <!-- 各种版块内容 -->
-    <div id="page-main">
-        <div class="card">
-            <div style="color:var(--gold); margin-bottom:10px;">💎 修炼机缘</div>
-            <button class="btn" onclick="action('train')">打坐</button>
-            <button class="btn" onclick="action('explore')">历练</button>
-            <button class="btn" id="couple-btn" style="display:none;" onclick="action('couple')">双修</button>
+        <!-- 聊天/传音 -->
+        <div id="page-chat" style="display:none;">
+            <div class="card">
+                <div class="chat-box" id="chat-content"></div>
+                <div style="display:flex; margin-top:10px;">
+                    <input type="text" id="chat-input" class="input-box" style="margin:0; flex:1;" placeholder="神识传音...">
+                    <button class="btn" onclick="sendMsg('normal')">传音</button>
+                </div>
+            </div>
         </div>
-        
-        <div class="card">
-            <div style="color:var(--gold); margin-bottom:10px;">📩 社交互动</div>
-            <input type="text" id="target-id" class="input-box" placeholder="输入对方ID" style="width:60%">
-            <button class="btn" onclick="social('friend')">加好友</button>
-            <button class="btn" onclick="social('propose')">求缘</button>
-        </div>
-    </div>
 
-    <div id="page-chat" style="display:none">
-        <div class="card">
-            <div style="color:var(--gold); margin-bottom:10px;">💬 传音大厅</div>
-            <div class="chat-area" id="main-chat"></div>
-            <div style="margin-top:10px; display:flex;">
-                <input type="text" id="msg-input" class="input-box" style="margin:0; flex:1;" placeholder="说点什么...">
-                <button class="btn" onclick="sendMsg('normal')">传音</button>
-                <button class="btn" onclick="sendMsg('world')" style="border-color:var(--gold)">全界</button>
+        <!-- 管理面板 (仅Ran可见) -->
+        <div id="page-admin" style="display:none;">
+            <div class="card">
+                <div style="color:var(--pink); margin-bottom:15px;">👁️ 主宰视角</div>
+                <p>在此你可以操控位面因果</p>
+                <button class="btn" onclick="adminAction('gift-all')">全服赠送1000灵石</button>
+                <button class="btn" onclick="adminAction('clear-chat')">肃清传音大厅</button>
             </div>
         </div>
     </div>
 
-    <div id="page-sect" style="display:none">
-        <div class="card">
-            <div style="color:var(--gold); margin-bottom:10px;">🏰 宗门大殿</div>
-            <div id="sect-list">正在感应诸天宗门...</div>
-            <hr style="border:0; border-top:1px solid #333; margin:15px 0;">
-            <input type="text" id="new-sect-name" class="input-box" placeholder="新宗门名称">
-            <button class="btn" onclick="createSect()">开宗立派 (5000灵石)</button>
-        </div>
+    <div class="nav">
+        <div class="nav-item active" onclick="switchPage('profile')">仙途</div>
+        <div class="nav-item" onclick="switchPage('chat')">传音</div>
     </div>
 </div>
 
-<!-- 底部导航 -->
-<div class="tab-nav" id="nav-bar" style="display:none">
-    <div class="tab-btn active" onclick="showPage('main')">仙途</div>
-    <div class="tab-btn" onclick="showPage('chat')">传音</div>
-    <div class="tab-btn" onclick="showPage('sect')">宗门</div>
-</div>
-
 <script>
-    // --- 天道连接配置 (宝宝，这里需要填入你注册后的Key) ---
-    AV.init({
-        appId: "这里填你的AppID",
-        appKey: "这里填你的AppKey",
-        serverURL: "这里填你的ServerURL"
-    });
+    // 这里填入你辛苦找回来的钥匙
+    const supabaseUrl = 'YOUR_SUPABASE_URL';
+    const supabaseKey = 'YOUR_SUPABASE_KEY';
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
     let me = null;
-    const LEVELS = ["凡人", "炼气", "筑基", "金丹", "元婴", "化神", "大乘", "渡劫"];
 
-    // 开启仙路
-    async function gateOpen() {
-        const qq = document.getElementById('qq-input').value;
-        const name = document.getElementById('name-input').value;
-        const gender = document.getElementById('gender-input').value;
-        if(!qq || !name) return alert("道号与QQ不可为空");
-
-        // 尝试查询该QQ是否已绑定
-        const query = new AV.Query('Player');
-        query.equalTo('qq', qq);
-        let result = await query.first();
-
-        if (result) {
-            // 已有账号，登录
-            me = result;
-            alert(`欢迎回来，${me.get('name')}`);
-        } else {
-            // 新注册
-            const Player = AV.Object.extend('Player');
-            me = new Player();
-            me.set('qq', qq);
-            me.set('name', name);
-            me.set('gender', gender);
-            me.set('level', 0);
-            me.set('money', 500);
-            me.set('power', 10);
-            me.set('sect', '散修');
-            me.set('partner', '无');
-            await me.save();
-            alert("降临成功！");
-        }
-        enterWorld();
+    function toggleAuth(type) {
+        document.getElementById('login-form').style.display = type === 'login' ? 'block' : 'none';
+        document.getElementById('reg-form').style.display = type === 'reg' ? 'block' : 'none';
+        document.getElementById('tab-login').className = 'tab-btn ' + (type === 'login' ? 'active' : '');
+        document.getElementById('tab-reg').className = 'tab-btn ' + (type === 'reg' ? 'active' : '');
     }
 
-    function enterWorld() {
-        document.getElementById('gate-screen').style.display = 'none';
-        document.getElementById('world-ui').style.display = 'block';
-        document.getElementById('nav-bar').style.display = 'flex';
+    // 登录逻辑：按名字搜索
+    async function handleLogin() {
+        const name = document.getElementById('login-name').value;
+        if(!name) return alert("请输入道号");
+
+        // 特权：如果名字是 Ran，且数据库没这个人，自动帮你生成一个，不需要QQ
+        if(name === 'Ran') {
+            let { data } = await _supabase.from('players').select('*').eq('name', 'Ran').single();
+            if(!data) {
+                const { data: adminUser } = await _supabase.from('players').insert([
+                    { qq: '999999', name: 'Ran', gender: '坤修', money: 999999, level: 7, sect: '天道宫' }
+                ]).select().single();
+                me = adminUser;
+            } else { me = data; }
+            return startWorld();
+        }
+
+        // 普通人登录
+        let { data, error } = await _supabase.from('players').select('*').eq('name', name).single();
+        if(!data) return alert("道号不存在，请先注册");
+        me = data;
+        startWorld();
+    }
+
+    // 注册逻辑：必须QQ和唯一道号
+    async function handleRegister() {
+        const qq = document.getElementById('reg-qq').value;
+        const name = document.getElementById('reg-name').value;
+        const gender = document.getElementById('reg-gender').value;
+        if(!qq || !name) return alert("QQ与道号必填");
+
+        // 检查道号或QQ是否已被占用
+        let { data: check } = await _supabase.from('players').select('*').or(`qq.eq.${qq},name.eq.${name}`);
+        if(check && check.length > 0) return alert("道号或QQ已被占领，请换一个");
+
+        const { data: newUser, error } = await _supabase.from('players').insert([
+            { qq: qq, name: name, gender: gender, money: 500, level: 0, sect: '散修' }
+        ]).select().single();
+        
+        if(error) return alert("注册失败：" + error.message);
+        me = newUser;
+        alert("神魂注就成功！");
+        startWorld();
+    }
+
+    function startWorld() {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-ui').style.display = 'block';
+        if(me.name === 'Ran') {
+            document.getElementById('admin-tag').style.display = 'inline';
+            document.getElementById('admin-btn').style.display = 'inline-block';
+        }
         updateUI();
-        startListening(); // 开启监听全服广播
+        syncChat();
+        _supabase.channel('public:messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, p => renderMsg(p.new)).subscribe();
     }
 
     function updateUI() {
-        document.getElementById('u-name').innerText = me.get('name');
-        document.getElementById('u-id').innerText = "#" + me.id.slice(-6);
-        document.getElementById('u-level').innerText = LEVELS[me.get('level')];
-        document.getElementById('u-money').innerText = me.get('money');
-        document.getElementById('u-power').innerText = me.get('power');
-        document.getElementById('u-sect').innerText = me.get('sect');
-        document.getElementById('u-partner').innerText = me.get('partner');
-        
-        if(me.get('partner') !== '无' || me.get('name') === 'Ran') {
-            document.getElementById('couple-btn').style.display = 'inline-block';
-        }
+        document.getElementById('display-name').innerText = me.name;
+        document.getElementById('display-money').innerText = me.money;
+        document.getElementById('display-sect').innerText = me.sect;
+        document.getElementById('display-qq').innerText = me.qq;
     }
 
-    // 传音功能
     async function sendMsg(type) {
-        const text = document.getElementById('msg-input').value;
-        if(!text) return;
-
-        const Chat = AV.Object.extend('Chat');
-        const msg = new Chat();
-        msg.set('from', me.get('name'));
-        msg.set('content', text);
-        msg.set('type', type); // normal 或 world
-        await msg.save();
-
-        document.getElementById('msg-input').value = "";
-        if(type === 'world') {
-            // 扣除传音石逻辑可以在这里加
-            alert("使用了传音石，全界播报！");
-        }
-        loadChat();
+        const content = document.getElementById('chat-input').value;
+        if(!content) return;
+        await _supabase.from('messages').insert([{ from: me.name, content: content, type: type }]);
+        document.getElementById('chat-input').value = "";
     }
 
-    async function loadChat() {
-        const query = new AV.Query('Chat');
-        query.descending('createdAt');
-        query.limit(20);
-        const results = await query.find();
-        const box = document.getElementById('main-chat');
+    async function syncChat() {
+        let { data } = await _supabase.from('messages').select('*').order('created_at', { ascending: false }).limit(20);
+        const box = document.getElementById('chat-content');
         box.innerHTML = "";
-        results.forEach(m => {
-            if(m.get('type') === 'world') {
-                box.innerHTML += `<div class="msg-sys">[全界播报] ${m.get('from')}: ${m.get('content')}</div>`;
-            } else {
-                box.innerHTML += `<div class="msg-normal"><b>${m.get('from')}:</b> ${m.get('content')}</div>`;
-            }
+        data.reverse().forEach(renderMsg);
+    }
+
+    function renderMsg(m) {
+        const box = document.getElementById('chat-content');
+        box.innerHTML += `<div style="margin-bottom:5px;"><b>${m.from}:</b> ${m.content}</div>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function switchPage(p) {
+        ['profile', 'chat', 'admin'].forEach(id => {
+            const el = document.getElementById('page-'+id);
+            if(el) el.style.display = (id === p) ? 'block' : 'none';
         });
     }
 
-    // --- 更多功能逻辑 (好友、求缘、宗门等) 同理调用 LeanCloud API ---
-    // ... 此处省略部分重复的交互代码，结构参考 sendMsg ...
-
-    function showPage(p) {
-        ['main', 'chat', 'sect'].forEach(id => {
-            document.getElementById('page-'+id).style.display = (id === p) ? 'block' : 'none';
-        });
-        if(p === 'chat') loadChat();
+    async function action(type) {
+        if(type === 'train') { me.money += 20; alert("获得灵石20"); }
+        await _supabase.from('players').update({ money: me.money }).eq('id', me.id);
+        updateUI();
     }
 
-    function action(type) {
-        // 更新灵石、修为并保存
-        let m = me.get('money');
-        if(type === 'explore') m += 50;
-        me.set('money', m);
-        me.save().then(() => updateUI());
+    async function adminAction(type) {
+        if(type === 'gift-all') {
+            alert("正在施展大荒施舍术...");
+            // 这里可以写更新所有人的逻辑，暂以提示为主
+        }
+        if(type === 'clear-chat') {
+            await _supabase.from('messages').delete().neq('id', 0);
+            alert("言论已肃清");
+            location.reload();
+        }
     }
 </script>
 </body>
 </html>
+const supabaseUrl = https://fjnpzauputcotjvmrytq.supabase.co/rest/v1/;
+const supabaseKey = sb_publishable_YZdfwigTvkCDB-XHmf4VOw_tgLN2NCc;
