@@ -3,232 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>诸天万界</title>
+    <title>诸天万界 · 造化</title>
     <style>
         :root {
             --gold: #ffd700;
-            --bg: #0d0d0d;
-            --card: #1a1a1a;
+            --bg: #0a0a0a;
+            --card: #161616;
             --pink: #ff748c;
             --text: #e0e0e0;
             --border: #333;
-            --glass: rgba(255, 255, 255, 0.05);
+            --btn-grad: linear-gradient(135deg, #ff748c 0%, #ff4d6d 100%);
         }
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #1a0a1a 0%, #0d0d0d 100%);
         }
         #app {
             width: 95%;
             max-width: 480px;
-            height: 92vh;
+            height: 95vh;
             background: var(--card);
-            padding: 0;
-            border-radius: 24px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 20px rgba(255, 116, 140, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.9), 0 0 15px rgba(255,116,140,0.2);
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            position: relative;
         }
 
-        /* 登录页美化 */
-        .auth-screen {
-            flex: 1;
+        /* 登录注册美化 */
+        .auth-panel {
+            padding: 40px 20px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: 40px;
-            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-        }
-        .auth-logo {
-            font-size: 42px;
+            gap: 15px;
             text-align: center;
-            margin-bottom: 40px;
-            color: var(--pink);
-            text-shadow: 0 0 20px var(--pink);
-            font-weight: bold;
-            letter-spacing: 5px;
         }
+        .logo-text { font-size: 36px; font-weight: bold; color: var(--pink); text-shadow: 0 0 15px var(--pink); letter-spacing: 4px; margin-bottom: 20px; }
+        
+        /* 状态栏 */
+        .status-card {
+            background: #222;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            border-left: 4px solid var(--pink);
+        }
+        .level-tag { color: var(--gold); font-weight: bold; font-size: 16px; display: block; margin-bottom: 5px; }
 
-        .input-box {
-            background: rgba(255,255,255,0.05);
+        /* 导航 */
+        .nav { display: flex; background: #111; padding: 5px; }
+        .nav-item { flex: 1; text-align: center; padding: 10px; font-size: 14px; cursor: pointer; color: #777; transition: 0.3s; }
+        .nav-item.active { color: var(--pink); font-weight: bold; border-bottom: 2px solid var(--pink); }
+
+        .panel { display: none; flex: 1; overflow-y: auto; padding: 15px; }
+        .panel.active { display: flex; flex-direction: column; }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #000;
             border: 1px solid #444;
             color: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
             box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
         }
-        .input-box:focus { border-color: var(--pink); background: rgba(255,255,255,0.1); }
-
-        .btn-prime {
-            background: linear-gradient(90deg, var(--pink), #ff4d6d);
+        button {
+            padding: 12px;
+            border-radius: 10px;
             border: none;
-            padding: 15px;
-            border-radius: 12px;
-            color: white;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 116, 140, 0.4);
-        }
-
-        /* 游戏主体 UI */
-        .header {
-            padding: 20px;
-            background: var(--glass);
-            border-bottom: 1px solid var(--border);
-            text-align: center;
-        }
-        .user-bar {
-            padding: 10px 20px;
-            background: #222;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--gold);
-        }
-
-        .nav-tabs {
-            display: flex;
-            background: #111;
-            padding: 5px;
-            justify-content: space-around;
-        }
-        .tab-item {
-            padding: 10px;
-            color: #777;
-            cursor: pointer;
-            font-size: 14px;
             transition: 0.3s;
         }
-        .tab-item.active { color: var(--pink); border-bottom: 2px solid var(--pink); }
-
-        .main-content { flex: 1; overflow-y: auto; padding: 15px; display: none; }
-        .main-content.active { display: block; }
-
-        /* 修炼特效 */
-        .cultivate-zone {
-            text-align: center;
-            padding: 30px 0;
-        }
-        .meditate-btn {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--pink) 0%, transparent 70%);
-            border: 2px solid var(--pink);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,116,140,0.7); } 70% { box-shadow: 0 0 0 20px rgba(255,116,140,0); } 100% { box-shadow: 0 0 0 0 rgba(255,116,140,0); } }
+        .btn-main { background: var(--btn-grad); color: white; }
+        .btn-sub { background: #333; color: white; font-size: 12px; }
 
         /* 列表项 */
-        .card-item {
-            background: #252525;
+        .item-card {
+            background: #1d1d1d;
             padding: 12px;
             border-radius: 10px;
             margin-bottom: 10px;
-            border: 1px solid #333;
+            border: 1px solid #2a2a2a;
         }
-        .msg-line { margin-bottom: 8px; font-size: 14px; }
-        .name-tag { color: var(--pink); font-weight: bold; margin-right: 5px; cursor: pointer; }
-        .admin-label { background: var(--pink); color: black; font-size: 10px; padding: 1px 4px; border-radius: 3px; margin-right: 5px; }
+        .admin-btn { background: var(--gold); color: black; margin-top: 10px; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
 <div id="app">
-    <!-- 认证屏 -->
-    <div id="auth-screen" class="auth-screen">
-        <div class="auth-logo">诸天万界</div>
-        <div id="login-box">
-            <input type="text" id="l-name" class="input-box" placeholder="道号">
-            <input type="password" id="l-pw" class="input-box" placeholder="神魂密匙">
-            <button class="btn-prime" style="width:100%" onclick="login()">契合神魂</button>
-            <p style="text-align:center; color:#888; margin-top:20px; cursor:pointer;" onclick="toggleAuth(true)">未曾入世？在此降生</p>
+    <!-- 登录注册 -->
+    <div id="auth-zone" class="auth-panel">
+        <div class="logo-text">诸天万界</div>
+        <div id="login-form">
+            <input type="text" id="l-name" placeholder="道号">
+            <input type="password" id="l-pw" placeholder="神魂密匙">
+            <button class="btn-main" style="width:100%" onclick="login()">契合神魂</button>
+            <p style="color:#666; font-size:14px; margin-top:20px; cursor:pointer;" onclick="toggleAuth(true)">初次降生</p>
         </div>
-        <div id="reg-box" style="display:none">
-            <input type="text" id="r-qq" class="input-box" placeholder="感应QQ">
-            <input type="text" id="r-name" class="input-box" placeholder="起个道号">
-            <input type="password" id="r-pw" class="input-box" placeholder="设置密匙">
-            <button class="btn-prime" style="width:100%" onclick="register()">刻画神魂</button>
-            <p style="text-align:center; color:#888; margin-top:20px; cursor:pointer;" onclick="toggleAuth(false)">已有神魂？点此归位</p>
+        <div id="reg-form" style="display:none">
+            <input type="text" id="r-qq" placeholder="感应QQ">
+            <input type="text" id="r-name" placeholder="起个道号">
+            <input type="password" id="r-pw" placeholder="设置密匙">
+            <button class="btn-main" style="width:100%" onclick="register()">刻画神魂</button>
+            <p style="color:#666; font-size:14px; margin-top:20px; cursor:pointer;" onclick="toggleAuth(false)">归位</p>
         </div>
     </div>
 
-    <!-- 游戏屏 -->
-    <div id="game-screen" style="display:none; flex-direction:column; height:100%;">
-        <div class="header" id="header-title">诸天万界</div>
-        <div class="user-bar" id="user-bar">
-            <span>修为: 0 | 灵石: 0</span>
-            <span>道侣: 无</span>
+    <!-- 游戏主屏 -->
+    <div id="game-zone" style="display:none; flex-direction:column; height:100%;">
+        <div class="status-card">
+            <span class="level-tag" id="u-rank">练气期 · 第一层</span>
+            <div style="display:flex; justify-content:space-between">
+                <span>编号: No.<b id="u-id">0</b> | 道号: <b id="u-name">...</b></span>
+                <span>灵石: <b id="u-money">0</b></span>
+            </div>
+            <div style="font-size:11px; color:#777; margin-top:5px;">今日修炼进度: <span id="u-daily">0/50</span></div>
         </div>
-        
-        <div class="nav-tabs">
-            <div class="tab-item active" onclick="switchTab('world')">诸天</div>
-            <div class="tab-item" onclick="switchTab('cultivate')">修炼</div>
-            <div class="tab-item" onclick="switchTab('shop')">百宝阁</div>
-            <div class="tab-item" onclick="switchTab('social')">红尘</div>
+
+        <div class="nav">
+            <div class="nav-item active" onclick="showPanel('world')">诸天</div>
+            <div class="nav-item" onclick="showPanel('action')">洞府</div>
+            <div class="nav-item" onclick="showPanel('social')">因果</div>
+            <div class="nav-item" id="nav-admin" style="display:none" onclick="showPanel('admin')">天道</div>
         </div>
 
         <!-- 诸天大厅 -->
-        <div id="tab-world" class="main-content active">
-            <div id="world-msgs" style="height:350px; overflow-y:auto; margin-bottom:10px;"></div>
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="world-input" class="input-box" style="margin:0;" placeholder="传音诸天...">
-                <button class="btn-prime" style="width:80px; padding:0;" onclick="sendWorldMsg()">传音</button>
+        <div id="p-world" class="panel active">
+            <div id="chat-box" style="flex:1; overflow-y:auto; margin-bottom:10px; font-size:14px;"></div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="chat-in" placeholder="传音..." style="margin:0;">
+                <button class="btn-main" onclick="sendChat()">传音</button>
             </div>
         </div>
 
-        <!-- 修炼区域 -->
-        <div id="tab-cultivate" class="main-content">
-            <div class="cultivate-zone">
-                <button class="meditate-btn" onclick="meditate()">冥想修行</button>
-                <p style="margin-top:20px; color:var(--gold)">点击凝聚天地灵气<br>(修为+5，灵石+2)</p>
+        <!-- 洞府（修炼、转账） -->
+        <div id="p-action" class="panel">
+            <div class="item-card" style="text-align:center; padding:30px 10px;">
+                <button class="btn-main" style="width:120px; height:120px; border-radius:50%;" onclick="cultivate()">冥想修行</button>
+                <p style="color:var(--gold); margin-top:10px;">修为+10, 灵石+5</p>
+            </div>
+            <div class="item-card">
+                <p style="font-size:14px; margin-bottom:10px;">灵石转赠</p>
+                <input type="text" id="trans-target" placeholder="对方编号或道号">
+                <input type="number" id="trans-amt" placeholder="转赠数量">
+                <button class="btn-sub" style="width:100%" onclick="transferMoney()">确认转赠</button>
             </div>
         </div>
 
-        <!-- 百宝阁 -->
-        <div id="tab-shop" class="main-content">
-            <div class="card-item">
-                <strong>聚灵丹</strong> <span style="color:var(--gold)">(100灵石)</span>
-                <p style="font-size:12px; color:#888">服用后修为瞬间增加500点</p>
-                <button class="btn-prime" style="padding:5px 10px; font-size:12px;" onclick="buyItem('dan')">购买</button>
+        <!-- 因果（好友、加人） -->
+        <div id="p-social" class="panel">
+            <div class="item-card">
+                <p style="font-size:14px; margin-bottom:10px;">寻找道友</p>
+                <input type="text" id="find-val" placeholder="输入编号或名字">
+                <button class="btn-main" style="width:100%" onclick="findPlayer()">发送结交申请</button>
             </div>
-            <div class="card-item">
-                <strong>道侣信物</strong> <span style="color:var(--gold)">(500灵石)</span>
-                <p style="font-size:12px; color:#888">向心仪的道友发起双修申请</p>
-                <button class="btn-prime" style="padding:5px 10px; font-size:12px;" onclick="buyItem('gift')">购买</button>
+            <div id="friend-list-area">
+                <p style="font-size:12px; color:var(--pink)">好友申请</p>
+                <div id="req-list" style="margin-bottom:15px;"></div>
+                <p style="font-size:12px; color:var(--gold)">我的道友</p>
+                <div id="friend-list"></div>
             </div>
         </div>
 
-        <!-- 红尘（社交） -->
-        <div id="tab-social" class="main-content">
-            <div style="margin-bottom:20px;">
-                <h4 style="color:var(--pink)">道友录</h4>
-                <div id="player-list"></div>
+        <!-- 天道（主宰权限） -->
+        <div id="p-admin" class="panel">
+            <h3 style="color:var(--gold)">主宰权限</h3>
+            <div class="item-card">
+                <p>快速创建修士</p>
+                <input type="text" id="adm-n" placeholder="新道号">
+                <input type="password" id="adm-p" placeholder="初始密匙">
+                <button class="btn-main" style="width:100%" onclick="adminCreateUser()">降生修士</button>
             </div>
-            <div id="friend-requests">
-                <h4 style="color:var(--gold)">好友请求</h4>
-                <div id="req-list"></div>
-            </div>
+            <button class="admin-btn" style="width:100%" onclick="adminClearChat()">肃清大厅传音</button>
         </div>
     </div>
 </div>
@@ -239,139 +197,164 @@
     const _db = supabase.createClient(SB_URL, SB_KEY);
 
     let me = null;
+    const RAN_PW = 'mr081104';
+    const DAILY_LIMIT = 50;
 
-    function toggleAuth(isReg) {
-        document.getElementById('login-box').style.display = isReg ? 'none' : 'block';
-        document.getElementById('reg-box').style.display = isReg ? 'block' : 'none';
+    // 等级体系
+    const RANKS = ["凡人", "练气期", "筑基期", "金丹期", "元婴期", "化神期", "合体期", "大乘期", "渡劫期"];
+    function getRank(exp) {
+        let lv = Math.floor(exp / 1000);
+        if(lv >= RANKS.length) return "仙人";
+        return `${RANKS[lv]} · ${Math.floor((exp%1000)/100)+1}层`;
     }
 
-    async function register() {
-        const qq = document.getElementById('r-qq').value;
-        const name = document.getElementById('r-name').value;
-        const pw = document.getElementById('r-pw').value;
-        if(!qq || !name || !pw) return alert('神魂不全');
-        const { error } = await _db.from('players').insert([{ qq, name, password: pw, level: 1, money: 100, exp: 0 }]);
-        if(!error) { alert('降生成功'); toggleAuth(false); }
-        else alert('降生失败');
+    function toggleAuth(isReg) {
+        document.getElementById('login-form').style.display = isReg ? 'none' : 'block';
+        document.getElementById('reg-form').style.display = isReg ? 'block' : 'none';
     }
 
     async function login() {
-        const name = document.getElementById('l-name').value;
-        const pw = document.getElementById('l-pw').value;
-        if(name === 'Ran' && pw === 'mr081104') {
-            enterGame({ name: 'Ran', level: 999, money: 88888, exp: 99999, sect: '天道' });
+        const n = document.getElementById('l-name').value.trim();
+        const p = document.getElementById('l-pw').value.trim();
+        if(n === 'Ran' && p === RAN_PW) {
+            enterGame({ id: 1, name: 'Ran', exp: 999999, money: 888888, daily_count: 0, last_op_date: '' });
             return;
         }
-        const { data } = await _db.from('players').select('*').eq('name', name).eq('password', pw).single();
-        if(data) enterGame(data);
-        else alert('神魂不匹配');
+        const { data } = await _db.from('players').select('*').eq('name', n).eq('password', p).single();
+        if(data) enterGame(data); else alert('神魂不配');
+    }
+
+    async function register() {
+        const q = document.getElementById('r-qq').value;
+        const n = document.getElementById('r-name').value;
+        const p = document.getElementById('r-pw').value;
+        const { error } = await _db.from('players').insert([{ qq: q, name: n, password: p, money: 100, exp: 0 }]);
+        if(!error) { alert('刻画成功'); toggleAuth(false); } else alert('降生失败');
     }
 
     function enterGame(player) {
         me = player;
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('game-screen').style.display = 'flex';
-        updateUI();
-        loadWorldMsgs();
-        
+        document.getElementById('auth-zone').style.display = 'none';
+        document.getElementById('game-zone').style.display = 'flex';
+        if(me.name === 'Ran') document.getElementById('nav-admin').style.display = 'block';
+        refreshUI();
+        loadChat();
+        loadSocial();
         // 实时传音
-        _db.channel('chat').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, p => appendWorld(p.new)).subscribe();
+        _db.channel('world').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, p => appendChat(p.new)).subscribe();
     }
 
-    function updateUI() {
-        document.getElementById('header-title').innerText = "诸天 · " + me.name;
-        document.getElementById('user-bar').innerHTML = `
-            <span>修为: ${me.exp} | 灵石: ${me.money}</span>
-            <span>道侣: ${me.partner || '孤苦伶仃'}</span>
-        `;
+    function refreshUI() {
+        document.getElementById('u-id').innerText = me.id;
+        document.getElementById('u-name').innerText = me.name;
+        document.getElementById('u-money').innerText = me.money;
+        document.getElementById('u-rank').innerText = getRank(me.exp);
+        
+        const today = new Date().toDateString();
+        if(me.last_op_date !== today) { me.daily_count = 0; }
+        document.getElementById('u-daily').innerText = `${me.daily_count}/${DAILY_LIMIT}`;
     }
 
-    function switchTab(tab) {
-        document.querySelectorAll('.main-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
+    function showPanel(id) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById('p-' + id).classList.add('active');
         event.target.classList.add('active');
-        if(tab === 'social') loadPlayers();
     }
 
-    // 修炼逻辑
-    async function meditate() {
-        me.exp += 5;
-        me.money += 2;
-        updateUI();
-        await _db.from('players').update({ exp: me.exp, money: me.money }).eq('name', me.name);
+    // 修炼
+    async function cultivate() {
+        const today = new Date().toDateString();
+        if(me.last_op_date === today && me.daily_count >= DAILY_LIMIT) return alert('今日经脉已疲劳，请明日再试');
+        
+        me.daily_count++;
+        me.last_op_date = today;
+        me.exp += 10;
+        me.money += 5;
+        refreshUI();
+        await _db.from('players').update({ exp: me.exp, money: me.money, daily_count: me.daily_count, last_op_date: today }).eq('id', me.id);
     }
 
-    // 商店逻辑
-    async function buyItem(type) {
-        if(type === 'dan') {
-            if(me.money < 100) return alert('灵石不足');
-            me.money -= 100;
-            me.exp += 500;
-        } else if(type === 'gift') {
-            if(me.money < 500) return alert('灵石不足');
-            me.money -= 500;
-            alert('信物已购，去红尘找道友双修吧');
-        }
-        updateUI();
-        await _db.from('players').update({ exp: me.exp, money: me.money }).eq('name', me.name);
+    // 转账
+    async function transferMoney() {
+        const target = document.getElementById('trans-target').value;
+        const amt = parseInt(document.getElementById('trans-amt').value);
+        if(!target || amt <= 0 || me.money < amt) return alert('灵石不足或目标不全');
+
+        const { data: rec } = await _db.from('players').select('*').or(`id.eq.${target},name.eq.${target}`).single();
+        if(!rec) return alert('寻不到此人');
+
+        await _db.from('players').update({ money: me.money - amt }).eq('id', me.id);
+        await _db.from('players').update({ money: rec.money + amt }).eq('id', rec.id);
+        me.money -= amt;
+        refreshUI();
+        alert('转赠成功');
     }
 
-    // 社交逻辑
-    async function loadPlayers() {
-        const { data } = await _db.from('players').select('name, exp, partner').limit(50);
-        const box = document.getElementById('player-list');
-        box.innerHTML = '';
-        data.forEach(p => {
-            if(p.name === me.name) return;
+    // 好友
+    async function findPlayer() {
+        const val = document.getElementById('find-val').value;
+        const { data: rec } = await _db.from('players').select('*').or(`id.eq.${val},name.eq.${val}`).single();
+        if(!rec) return alert('诸天查无此人');
+        await _db.from('friend_reqs').insert([{ sender_name: me.name, receiver_id: rec.id, receiver_name: rec.name }]);
+        alert('结交申请已发出');
+    }
+
+    async function loadSocial() {
+        const { data: reqs } = await _db.from('friend_reqs').select('*').eq('receiver_id', me.id).eq('status', 'pending');
+        const rList = document.getElementById('req-list');
+        rList.innerHTML = '';
+        reqs?.forEach(r => {
             const div = document.createElement('div');
-            div.className = 'card-item';
-            div.innerHTML = `
-                <span class="name-tag">${p.name}</span> 
-                <span style="font-size:12px; color:#666">修为: ${p.exp}</span>
-                <div style="margin-top:5px; display:flex; gap:10px;">
-                    <button class="btn-prime" style="padding:3px 8px; font-size:10px; background:#333;" onclick="addFriend('${p.name}')">加好友</button>
-                    <button class="btn-prime" style="padding:3px 8px; font-size:10px; background:#443;" onclick="propose('${p.name}')">求结道侣</button>
-                </div>
-            `;
-            box.appendChild(div);
+            div.className = 'item-card';
+            div.innerHTML = `${r.sender_name} 欲与你结交 <button class="btn-sub" onclick="acceptFriend(${r.id}, '${r.sender_name}')">同意</button>`;
+            rList.appendChild(div);
         });
     }
 
-    async function addFriend(target) {
-        alert('已向 ' + target + ' 发起神识结交');
-        await _db.from('friendships').insert([{ user_a: me.name, user_b: target }]);
+    async function acceptFriend(rid, sname) {
+        await _db.from('friend_reqs').update({ status: 'accepted' }).eq('id', rid);
+        alert('因果已定，你们成为了道友');
+        loadSocial();
     }
 
-    async function propose(target) {
-        alert('已向 ' + target + ' 发起双修契约，请静候回音');
-        await _db.from('partner_proposals').insert([{ sender: me.name, receiver: target }]);
-    }
-
-    // 聊天逻辑
-    async function loadWorldMsgs() {
+    // 聊天
+    async function loadChat() {
         const { data } = await _db.from('messages').select('*').order('created_at', { ascending: false }).limit(30);
-        const box = document.getElementById('world-msgs');
+        const box = document.getElementById('chat-box');
         box.innerHTML = '';
-        if(data) data.reverse().forEach(m => appendWorld(m));
+        data?.reverse().forEach(m => appendChat(m));
     }
 
-    function appendWorld(m) {
-        const box = document.getElementById('world-msgs');
+    function appendChat(m) {
+        const box = document.getElementById('chat-box');
         const div = document.createElement('div');
-        div.className = 'msg-line';
-        const tag = m.name === 'Ran' ? '<span class="admin-label">主宰</span>' : '';
-        div.innerHTML = `${tag}<span class="name-tag">${m.name}</span>: ${m.content}`;
+        div.style.marginBottom = '5px';
+        const tag = m.name === 'Ran' ? '<b style="color:var(--pink)">[主宰]</b> ' : '';
+        div.innerHTML = `${tag}<span style="color:var(--gold)">${m.name}</span>: ${m.content}`;
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
     }
 
-    async function sendWorldMsg() {
-        const input = document.getElementById('world-input');
-        const content = input.value.trim();
-        if(!content) return;
-        await _db.from('messages').insert([{ name: me.name, content }]);
+    async function sendChat() {
+        const input = document.getElementById('chat-in');
+        if(!input.value) return;
+        await _db.from('messages').insert([{ name: me.name, content: input.value }]);
         input.value = '';
+    }
+
+    // 管理员功能
+    async function adminCreateUser() {
+        const n = document.getElementById('adm-n').value;
+        const p = document.getElementById('adm-p').value;
+        await _db.from('players').insert([{ name: n, password: p, money: 100, exp: 0 }]);
+        alert('修士 ' + n + ' 已降生');
+    }
+
+    async function adminClearChat() {
+        if(!confirm('确定肃清？')) return;
+        await _db.from('messages').delete().neq('id', 0);
+        location.reload();
     }
 </script>
 </body>
