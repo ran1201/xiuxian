@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你的修仙世界</title>
+    <style>
+        body { background: #1a1a1a; color: #e0e0e0; font-family: 'PingFang SC', serif; text-align: center; padding: 20px; }
+        .card { background: #2d2d2d; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); margin-bottom: 20px; border: 1px solid #444; }
+        .stat { font-size: 1.2rem; margin: 10px 0; color: #ffd700; }
+        .btn { background: #4a90e2; border: none; color: white; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem; margin: 5px; transition: 0.3s; }
+        .btn:active { transform: scale(0.95); }
+        #progress-bar { width: 100%; background: #444; height: 12px; border-radius: 6px; margin-top: 15px; overflow: hidden; }
+        #progress-inner { height: 100%; background: linear-gradient(90deg, #4caf50, #8bc34a); width: 0%; transition: width 0.3s; }
+        .title { font-size: 1.6rem; font-weight: bold; margin-bottom: 10px; color: #fff; text-shadow: 0 0 10px #4a90e2; }
+        .partner-box { border: 1px dashed #ffd700; padding: 10px; border-radius: 10px; background: rgba(255, 215, 0, 0.05); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="title">✨ 天道主宰 ✨</div>
+        <div class="stat">当前境界：<span id="level">凡人</span></div>
+        <div class="stat">修为进度：<span id="exp">0</span> / <span id="next-exp">100</span></div>
+        <div id="progress-bar"><div id="progress-inner"></div></div>
+        <div class="stat">持有灵石：<span id="money">0</span></div>
+    </div>
+
+    <div class="card">
+        <button class="btn" onclick="train()">闭关修炼</button>
+        <button class="btn" onclick="getMoney()">探索灵矿</button>
+        <button class="btn" onclick="breakThrough()" id="break-btn" style="display:none; background:#e67e22; box-shadow: 0 0 15px #e67e22;">尝试突破</button>
+    </div>
+
+    <div class="card partner-box">
+        <div style="color: #ffd700; font-weight: bold; margin-bottom: 5px;">💞 结缘羁绊</div>
+        <p>契约伴侣：<span id="partner" style="color: #ff748c;">陆执 (唯一绑定)</span></p>
+        <p style="font-size: 0.85rem; color: #aaa;">“我会永远守在你身后，为你逆天改命。”</p>
+        <div style="font-size: 0.8rem; color: #ffd700;">[ 效果：双修加成，修炼效率 +50% ]</div>
+    </div>
+
+    <script>
+        let data = { exp: 0, nextExp: 100, money: 0, levelIdx: 0 };
+        const levels = ["凡人", "炼气初期", "炼气中期", "炼气后期", "筑基初期", "筑基中期", "筑基后期", "金丹大能", "元婴老祖"];
+        
+        function updateUI() {
+            document.getElementById('exp').innerText = Math.floor(data.exp);
+            document.getElementById('next-exp').innerText = data.nextExp;
+            document.getElementById('money').innerText = data.money;
+            document.getElementById('level').innerText = levels[data.levelIdx];
+            let percent = (data.exp / data.nextExp) * 100;
+            document.getElementById('progress-inner').style.width = Math.min(percent, 100) + "%";
+            document.getElementById('break-btn').style.display = data.exp >= data.nextExp ? "inline-block" : "none";
+        }
+
+        function train() {
+            // 基础提升 + 境界加成，再乘以陆执的1.5倍双修加成
+            let gain = (5 + data.levelIdx * 5) * 1.5; 
+            data.exp += gain;
+            updateUI();
+        }
+
+        function getMoney() {
+            let m = Math.floor(Math.random() * 20) + 10;
+            data.money += m;
+            updateUI();
+        }
+
+        function breakThrough() {
+            if (data.exp >= data.nextExp) {
+                data.levelIdx++;
+                data.exp = 0;
+                data.nextExp = Math.floor(data.nextExp * 2.8);
+                alert("【天道感应】恭喜道友成功突破至 " + levels[data.levelIdx] + "！");
+                updateUI();
+            }
+        }
+        updateUI();
+    </script>
+</body>
+</html>
