@@ -1,193 +1,230 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>诸天万界 · 全能主宰版</title>
+    <title>诸天万界 · 始源全能卷</title>
     <style>
-        :root { --gold: #d4af37; --gold-l: #f9e29f; --bg: #050505; --card: #121212; --text: #e0e0e0; --border: #3d341a; --red: #ff4d4d; --blue: #4db8ff; }
-        * { box-sizing: border-box; font-family: 'PingFang SC', serif; }
+        :root { --gold: #d4af37; --gold-l: #f9e29f; --bg: #050505; --card: #111111; --text: #e0e0e0; --border: #3d341a; --red: #ff4d4d; --blue: #00a2ff; }
+        * { box-sizing: border-box; font-family: 'STSong', serif; }
         body { background: var(--bg); color: var(--text); margin: 0; overflow: hidden; height: 100vh; }
-        #app { width: 100%; max-width: 500px; height: 100vh; margin: 0 auto; background: var(--card); border: 1px solid var(--border); display: flex; flex-direction: column; position: relative; }
         
-        /* 头部状态栏 */
-        .u-header { padding: 15px; background: #000; border-bottom: 2px solid var(--gold); display: flex; align-items: center; gap: 12px; z-index: 100; }
-        .u-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
-        .u-info-main { flex: 1; }
-        .u-name-line { display: flex; align-items: center; gap: 6px; }
-        .u-badge { background: var(--gold); color: #000; font-size: 10px; padding: 1px 5px; border-radius: 3px; font-weight: bold; }
+        /* 全局框架 */
+        #app { width: 100%; max-width: 500px; height: 100vh; margin: 0 auto; background: var(--card); border: 1px solid var(--border); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 50px #000; }
         
-        /* 页面导航系统 */
-        .page { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
+        /* 尊贵头部 */
+        .u-header { padding: 20px 15px; background: linear-gradient(to bottom, #000, #111); border-bottom: 2px solid var(--gold); display: flex; align-items: center; gap: 15px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
+        .u-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; box-shadow: 0 0 10px var(--gold); }
+        .u-info-box { flex: 1; }
+        .u-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .u-name-text { font-size: 18px; font-weight: bold; color: var(--gold-l); text-shadow: 0 0 5px var(--gold); }
+        .u-badge { background: var(--gold); color: #000; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; letter-spacing: 1px; }
+        
+        /* 页面显示切换 */
+        .page { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; animation: slideIn 0.4s ease-out; }
         .page.active { display: flex; flex-direction: column; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* 通用组件 */
-        .gold-card { background: #1a1a1a; border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 12px; }
-        .section-title { color: var(--gold); font-size: 14px; font-weight: bold; border-left: 3px solid var(--gold); padding-left: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; }
-        .btn-gold { background: linear-gradient(135deg, var(--gold), #8a6d1d); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-dark { background: #000; color: var(--gold); border: 1px solid var(--border); padding: 8px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-        input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        /* 卡片设计 */
+        .gold-card { background: rgba(30, 30, 30, 0.8); border: 1px solid var(--border); border-radius: 15px; padding: 18px; margin-bottom: 15px; position: relative; backdrop-filter: blur(5px); }
+        .section-header { color: var(--gold); font-size: 15px; font-weight: bold; border-left: 4px solid var(--gold); padding-left: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* 按钮与输入 */
+        .btn-main { background: linear-gradient(135deg, #d4af37, #8a6d1d); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .btn-main:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-sub { background: #000; color: var(--gold); border: 1px solid var(--border); padding: 8px 15px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+        input { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 14px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; }
 
-        /* 聊天模块 */
-        .chat-wrap { flex: 1; display: flex; flex-direction: column; background: #080808; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; height: 350px; }
-        .chat-tabs { display: flex; background: #000; }
-        .chat-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; color: #555; cursor: pointer; }
-        .chat-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-        .msg-list { flex: 1; overflow-y: auto; padding: 10px; font-size: 13px; }
-        .msg-item { margin-bottom: 8px; border-bottom: 1px solid #151515; padding-bottom: 4px; }
-        .msg-sender { color: var(--gold); font-weight: bold; margin-right: 5px; cursor: pointer; }
+        /* 聊天系统 */
+        .chat-panel { flex: 1; display: flex; flex-direction: column; border-radius: 15px; border: 1px solid var(--border); overflow: hidden; height: 380px; background: #080808; }
+        .chat-nav { display: flex; border-bottom: 1px solid var(--border); }
+        .chat-tab { flex: 1; padding: 15px; text-align: center; font-size: 14px; color: #444; cursor: pointer; transition: 0.3s; }
+        .chat-tab.active { color: var(--gold); background: #111; border-bottom: 2px solid var(--gold); font-weight: bold; }
+        .msg-area { flex: 1; overflow-y: auto; padding: 15px; font-size: 14px; }
+        .msg-bubble { margin-bottom: 12px; line-height: 1.5; padding: 8px; border-bottom: 1px solid #1a1a1a; }
+        .msg-user { color: var(--gold); font-weight: bold; margin-right: 8px; cursor: pointer; }
 
         /* 进度条 */
-        .prog-bg { width: 100%; height: 6px; background: #222; border-radius: 3px; margin: 8px 0; overflow: hidden; }
-        .prog-fill { height: 100%; background: var(--gold); transition: 0.5s; }
+        .bar-bg { width: 100%; height: 8px; background: #222; border-radius: 4px; margin: 10px 0; overflow: hidden; border: 1px solid #333; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #8a6d1d, #d4af37); transition: 0.8s; }
 
-        /* 底部导航 */
-        .nav-bottom { position: absolute; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; border-top: 1px solid var(--border); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #555; cursor: pointer; }
-        .nav-item.active { color: var(--gold); }
+        /* 底部导航系统 */
+        .nav-bar { position: absolute; bottom: 0; width: 100%; height: 80px; background: #000; display: flex; border-top: 1px solid var(--border); box-shadow: 0 -5px 20px rgba(0,0,0,0.9); }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #444; transition: 0.3s; }
+        .nav-btn.active { color: var(--gold); font-weight: bold; }
+        .nav-ico { font-size: 24px; margin-bottom: 4px; }
+        
+        /* 主宰 UI 特效 */
+        .admin-glow { border: 1px solid var(--red) !important; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="app">
-    <!-- 1. 认证页面 (修复注册Bug & 强制QQ) -->
+    <!-- 第一页：降生与归位 (修复注册逻辑 & 强制QQ) -->
     <div id="p-auth" class="page active" style="justify-content:center; text-align:center;">
-        <h1 style="color:var(--gold); font-size:32px; letter-spacing:8px;">诸天万界</h1>
-        <div class="gold-card" style="margin-top:20px;">
-            <input id="auth-name" placeholder="修士道号">
+        <h1 style="color:var(--gold); font-size:36px; letter-spacing:10px; margin-bottom:5px;">诸天万界</h1>
+        <p style="color:#666; font-size:12px; margin-bottom:30px;">—— 唯主宰 Ran 永恒不灭 ——</p>
+        <div class="gold-card">
+            <input id="auth-name" placeholder="输入道号">
             <input id="auth-pw" type="password" placeholder="神识密钥">
-            <input id="auth-qq" placeholder="绑定QQ号 (一Q一号)">
-            <button class="btn-gold" style="width:100%" onclick="handleAuth('login')">归位</button>
-            <div style="margin-top:15px; display:flex; gap:10px;">
-                <button class="btn-dark" style="flex:1" onclick="handleAuth('reg')">降生注册</button>
+            <input id="auth-qq" placeholder="绑定 QQ 号 (一 Q 一号)">
+            <button class="btn-main" style="width:100%" onclick="handleAuth('login')">归位入世</button>
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn-sub" style="flex:1" onclick="handleAuth('reg')">降生注册</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. 游戏核心框架 -->
+    <!-- 游戏主架构 -->
     <div id="game-main" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
+        <!-- 全局头部 -->
         <div class="u-header">
             <img id="u-avatar" class="u-avatar" src="" onclick="triggerAvatar()">
             <input type="file" id="avatar-input" style="display:none" onchange="uploadAvatar()">
-            <div class="u-info-main">
-                <div class="u-name-line">
-                    <span id="u-name" style="font-weight:bold; color:var(--gold-l);"></span>
+            <div class="u-info-box">
+                <div class="u-name-row">
+                    <span id="u-name" class="u-name-text"></span>
                     <span id="u-title" class="u-badge"></span>
                 </div>
-                <div style="font-size:11px; margin-top:4px; color:#999;">
+                <div style="font-size:12px; color:#aaa;">
                     灵石: <span id="u-money" style="color:var(--gold)"></span> | 贡献: <span id="u-contrib" style="color:var(--blue)"></span>
                 </div>
             </div>
-            <button class="btn-dark" onclick="doCheckin()">签到</button>
+            <button class="btn-sub" onclick="doCheckin()">每日签到</button>
         </div>
 
-        <!-- 页面：洞府 (修炼/任务/双修) -->
+        <!-- 分页 1：洞府 (修炼/双修/任务) -->
         <div id="p-cave" class="page">
             <div class="gold-card" style="text-align:center;">
-                <div id="u-realm" style="color:var(--gold); font-weight:bold; font-size:18px;"></div>
-                <div class="prog-bg"><div id="exp-fill" class="prog-fill"></div></div>
-                <div style="font-size:10px; color:#666;">修为值: <span id="u-exp-val"></span></div>
+                <div id="u-realm" style="color:var(--gold); font-weight:bold; font-size:22px; margin-bottom:10px;"></div>
+                <div class="bar-bg"><div id="exp-bar" class="bar-fill"></div></div>
+                <div style="font-size:11px; color:#666;">修行进度: <span id="u-exp-txt"></span></div>
                 
-                <button class="btn-gold" style="width:140px; height:140px; border-radius:50%; margin:20px 0; font-size:20px;" onclick="doPractice()">运转周天</button>
+                <button class="btn-main" style="width:150px; height:150px; border-radius:50%; margin:25px 0; font-size:22px; box-shadow:0 0 20px var(--gold);" onclick="doPractice()">吸纳天地灵气</button>
                 
-                <div style="display:flex; justify-content:space-around; font-size:12px;">
-                    <div>今日上限: <span id="u-daily-exp">0</span> / 2000</div>
-                    <div id="u-comp">道侣: 无</div>
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--gold-l);">
+                    <div>今日灵气上限: <span id="u-daily-exp">0</span> / 2000</div>
+                    <div id="u-companion-txt">道侣: 无</div>
                 </div>
             </div>
-            <div class="gold-card"><div class="section-title">天道敕令任务</div><div id="task-list"></div></div>
+            <div class="gold-card">
+                <div class="section-header">天道敕令任务</div>
+                <div id="task-list" style="font-size:13px;"></div>
+            </div>
         </div>
 
-        <!-- 页面：宗门 (修复所有职位贡献) -->
+        <!-- 分页 2：宗门 (修复所有职位贡献 Bug) -->
         <div id="p-sect" class="page">
             <div id="sect-none" style="display:none;">
                 <div class="gold-card">
-                    <div class="section-title">开宗立派</div>
-                    <input id="new-sect-n" placeholder="输入宗门名 (需5000灵石)">
-                    <button class="btn-gold" style="width:100%" onclick="createSect()">敕建宗门</button>
+                    <div class="section-header">创立万古仙门</div>
+                    <input id="new-sect-n" placeholder="输入宗门名 (消耗 5000 灵石)">
+                    <button class="btn-main" style="width:100%" onclick="createSect()">开宗立派</button>
                 </div>
-                <div class="gold-card"><div class="section-title">依附强宗</div><div id="all-sects-list"></div></div>
+                <div class="gold-card">
+                    <div class="section-header">诸天宗门名录</div>
+                    <div id="all-sects-list"></div>
+                </div>
             </div>
             <div id="sect-hall" style="display:none;">
                 <div class="gold-card">
-                    <div class="section-title"><span id="s-name"></span> <button class="btn-dark" onclick="quitSect()">叛出宗门</button></div>
-                    <div style="font-size:13px;">职级: <span id="s-pos-name" style="color:var(--gold)"></span></div>
+                    <div class="section-header">
+                        <span id="s-name" style="font-size:18px;"></span>
+                        <button class="btn-sub" onclick="quitSect()">叛出宗门</button>
+                    </div>
+                    <div style="font-size:14px;">我的职级: <span id="s-pos-name" style="color:var(--gold)"></span></div>
                 </div>
+                <!-- 宗门宝阁 -->
                 <div class="gold-card">
-                    <div class="section-title">宗门宝阁 (贡献兑换)</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <button class="btn-dark" onclick="buySectItem('money')">支取1000灵石(1k贡献)</button>
-                        <button class="btn-dark" onclick="buySectItem('title')">申请内门封号(2k贡献)</button>
+                    <div class="section-header">宗门宝阁 (贡献兑换)</div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <button class="btn-sub" onclick="buySectItem('money')">支取1000灵石(1k贡献)</button>
+                        <button class="btn-sub" onclick="buySectItem('title')">申请宗门封号(2k贡献)</button>
                     </div>
                 </div>
+                <!-- 宗主管理 -->
                 <div id="sect-admin-box" class="gold-card" style="display:none; border:1px solid var(--gold);">
-                    <div class="section-title">宗主权柄</div>
+                    <div class="section-header">宗主生杀大权</div>
                     <input id="prom-target" placeholder="弟子道号">
-                    <button class="btn-gold" style="width:100%" onclick="promoteDisciple()">提拔弟子职级</button>
+                    <button class="btn-main" style="width:100%" onclick="promoteDisciple()">提拔弟子职级</button>
                 </div>
-                <div class="gold-card"><div class="section-title">同门修士</div><div id="sect-members"></div></div>
+                <div class="gold-card">
+                    <div class="section-header">同门修士</div>
+                    <div id="sect-members"></div>
+                </div>
             </div>
         </div>
 
-        <!-- 页面：诸天 (聊天/百宝阁/榜单) -->
+        <!-- 分页 3：诸天 (聊天/百宝阁/排行) -->
         <div id="p-world" class="page">
-            <div class="chat-wrap">
-                <div class="chat-tabs">
-                    <div id="t-world" class="chat-tab active" onclick="switchChat('WORLD')">世界大厅</div>
-                    <div id="t-priv" class="chat-tab" onclick="switchChat('PRIVATE')">神识传音</div>
+            <div class="chat-panel">
+                <div class="chat-nav">
+                    <div id="tab-world" class="chat-tab active" onclick="switchChat('WORLD')">世界大厅</div>
+                    <div id="tab-priv" class="chat-tab" onclick="switchChat('PRIVATE')">神识私传</div>
                 </div>
-                <div id="msg-list" class="msg-list"></div>
-                <div style="display:flex; padding:8px; gap:5px; border-top:1px solid var(--border);">
-                    <input id="chat-input" style="margin:0; flex:1;" placeholder="请输入传音内容...">
-                    <button class="btn-gold" onclick="sendMsg()">传</button>
+                <div id="msg-list" class="msg-area"></div>
+                <div style="display:flex; padding:10px; gap:8px; border-top:1px solid var(--border); background:#000;">
+                    <input id="chat-input" style="margin:0; flex:1;" placeholder="传音内容...">
+                    <button class="btn-main" style="padding:0 20px;" onclick="sendMsg()">传</button>
                 </div>
             </div>
 
-            <div class="gold-card" style="margin-top:12px;">
-                <div class="section-title">诸天百宝阁 · 稀世珍宝</div>
+            <div class="gold-card" style="margin-top:15px;">
+                <div class="section-header">诸天百宝阁 · 稀世珍宝</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    <button class="btn-dark" onclick="openShop('rename')">《易名金册》(1万)</button>
-                    <button class="btn-dark" onclick="openShop('title')">《帝号残卷》(5千)</button>
-                    <button class="btn-dark" onclick="openShop('artifact_1')">《乾坤鼎》(5万)</button>
-                    <button class="btn-dark" onclick="openShop('artifact_2')">《幽冥珠》(3万)</button>
-                    <button class="btn-dark" onclick="openShop('artifact_3')">《龙凤玉佩》(2万)</button>
-                    <button class="btn-dark" onclick="openShop('artifact_4')">《九阳炉》(1.5万)</button>
+                    <button class="btn-sub" onclick="openShop('rename')">《易名金册》(1万)</button>
+                    <button class="btn-sub" onclick="openShop('title')">《帝号残卷》(5千)</button>
+                    <button class="btn-sub" onclick="openShop('artifact_1')">《乾坤鼎》(5万)</button>
+                    <button class="btn-sub" onclick="openShop('artifact_2')">《幽冥珠》(3万)</button>
+                    <button class="btn-sub" onclick="openShop('artifact_3')">《龙凤玉佩》(2万)</button>
+                    <button class="btn-sub" onclick="openShop('artifact_4')">《九阳炉》(1.5万)</button>
                 </div>
             </div>
-            <div class="gold-card"><div class="section-title">诸天榜单 (天道不入榜)</div><div id="rank-list"></div></div>
+            
+            <div class="gold-card">
+                <div class="section-header">诸天战力榜 (主宰不上榜)</div>
+                <div id="rank-list"></div>
+            </div>
         </div>
 
-        <!-- 页面：主宰 (Ran专属管理) -->
+        <!-- 分页 4：主宰 (Ran 专用管理面板) -->
         <div id="p-admin" class="page">
-            <div class="gold-card" style="border:2px solid var(--red)">
-                <div class="section-title" style="color:var(--red)">天道造物 (直接创号)</div>
+            <div class="gold-card admin-glow">
+                <div class="section-header" style="color:var(--red)">天道造物 (直接创号)</div>
                 <input id="adm-new-n" placeholder="新修士道号">
-                <input id="adm-new-p" placeholder="初始神识密钥">
-                <button class="btn-gold" style="width:100%" onclick="adminCreateUser()">创造灵魂 (无需QQ绑定)</button>
+                <input id="adm-new-p" placeholder="初始密钥">
+                <button class="btn-main" style="width:100%" onclick="adminCreateUser()">创造灵魂 (绕过QQ绑定)</button>
             </div>
-            <div class="gold-card">
-                <div class="section-title">众生奖惩</div>
-                <input id="adm-target" placeholder="目标道号">
+            <div class="gold-card admin-glow">
+                <div class="section-header">众生奖惩 · 普降雨露</div>
+                <input id="adm-target" placeholder="目标道号 (发全服留空)">
                 <input id="adm-amount" type="number" placeholder="灵石数额">
                 <div style="display:flex; gap:10px; margin-bottom:10px;">
-                    <button class="btn-gold" style="flex:1" onclick="adminReward('single')">单独赐予</button>
-                    <button class="btn-gold" style="flex:1; background:var(--red); color:#fff;" onclick="adminReward('all')">全服普降雨露</button>
+                    <button class="btn-main" style="flex:1" onclick="adminReward('single')">赐予灵石</button>
+                    <button class="btn-main" style="flex:1; background:var(--red); color:#fff;" onclick="adminReward('all')">全服灵石雨</button>
                 </div>
-                <button class="btn-dark" style="width:100%" onclick="adminAction('ban')">封印神魂 (禁言/封号)</button>
-                <button class="btn-dark" style="width:100%; margin-top:5px;" onclick="adminAction('del_sect')">抹除宗门因果</button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-sub" style="flex:1; border-color:var(--red);" onclick="adminAction('ban')">封印神魂</button>
+                    <button class="btn-sub" style="flex:1; border-color:var(--red);" onclick="adminAction('del_sect')">抹除宗门</button>
+                </div>
             </div>
-            <div class="gold-card">
-                <div class="section-title">颁布天道敕令</div>
+            <div class="gold-card admin-glow">
+                <div class="section-header">颁布天道敕令任务</div>
                 <input id="adm-task-c" placeholder="任务内容...">
-                <button class="btn-gold" style="width:100%" onclick="adminPostTask()">颁布</button>
+                <button class="btn-main" style="width:100%" onclick="adminPostTask()">敕令颁布</button>
             </div>
         </div>
 
-        <nav class="nav-bottom">
-            <div class="nav-item active" onclick="navTo('cave')">洞府</div>
-            <div class="nav-item" onclick="navTo('sect')">宗门</div>
-            <div class="nav-item" onclick="navTo('world')">诸天</div>
-            <div id="nav-admin" class="nav-item" style="display:none; color:var(--red)" onclick="navTo('admin')">主宰</div>
+        <!-- 底部导航栏 -->
+        <nav class="nav-bar">
+            <div class="nav-btn active" onclick="navTo('cave')"><span class="nav-ico">🧘</span>洞府</div>
+            <div class="nav-btn" onclick="navTo('sect')"><span class="nav-ico">⛩️</span>宗门</div>
+            <div class="nav-btn" onclick="navTo('world')"><span class="nav-ico">🌍</span>诸天</div>
+            <div id="nav-admin" class="nav-btn" style="display:none; color:var(--red)" onclick="navTo('admin')">
+                <span class="nav-ico">⚖️</span>主宰
+            </div>
         </nav>
     </div>
 </div>
@@ -201,31 +238,32 @@
     let chatMode = 'WORLD';
     const REALMS = ["炼气", "筑基", "金丹", "元婴", "化神", "合体", "渡劫", "大乘", "人仙", "地仙", "天仙", "金仙", "大罗金仙", "准圣", "圣人", "天道主宰"];
 
-    // --- 认证系统修复 ---
+    // --- 认证系统 (严格修复版) ---
     async function handleAuth(type) {
         const n = document.getElementById('auth-name').value.trim();
         const p = document.getElementById('auth-pw').value.trim();
         const q = document.getElementById('auth-qq').value.trim();
-        if(!n || !p || !q) return alert("道号、密钥、QQ缺一不可");
+        if(!n || !p || !q) return alert("道号、密钥、QQ 均为入世凭证，缺一不可");
 
         if(type==='reg') {
+            // 唯一 QQ 校验
             const {data:qqCheck} = await _db.from('players').select('id').eq('qq_number', q);
-            if(qqCheck && qqCheck.length > 0) return alert("此QQ已绑定其它神魂");
+            if(qqCheck && qqCheck.length > 0) return alert("该 QQ 已绑定其它神魂，无法再次降生");
             const {error} = await _db.from('players').insert([{name:n, password:p, qq_number:q}]);
-            if(error) return alert("道号已被占用");
+            if(error) return alert("此道号已被占领");
             alert("注册成功！");
         }
         
         const {data, error} = await _db.from('players').select('*').eq('name',n).eq('password',p).eq('qq_number',q).single();
-        if(!data) return alert("验证失败");
-        if(data.is_banned) return alert("神魂已被封印");
+        if(!data) return alert("身份校验失败，神魂不匹配");
+        if(data.is_banned) return alert("你的神魂已被封印，无法入世");
         
         me = data;
         document.getElementById('p-auth').style.display='none';
         document.getElementById('game-main').style.display='flex';
         if(me.is_admin) document.getElementById('nav-admin').style.display='flex';
         
-        refreshUI(); startLive();
+        refreshUI(); startRealtime();
     }
 
     function refreshUI() {
@@ -237,28 +275,29 @@
         
         const rIdx = Math.min(Math.floor(me.exp/5000), 15);
         document.getElementById('u-realm').innerText = REALMS[rIdx];
-        document.getElementById('exp-fill').style.width = ((me.exp % 5000)/5000)*100 + '%';
-        document.getElementById('u-exp-val').innerText = `${me.exp} / ${(rIdx+1)*5000}`;
-        document.getElementById('u-daily-exp').innerText = me.daily_exp_count;
-        document.getElementById('u-comp').innerText = "道侣: " + (me.companion_name || "无");
+        document.getElementById('exp-bar').style.width = ((me.exp % 5000)/5000)*100 + '%';
+        document.getElementById('u-exp-txt').innerText = `${me.exp} / ${(rIdx+1)*5000}`;
+        document.getElementById('u-daily-exp').innerText = me.daily_exp_count || 0;
+        document.getElementById('u-companion-txt').innerText = "道侣: " + (me.companion_name || "无");
         
         loadSectInfo(); loadTasks(); loadRank(); loadMsgs();
     }
 
-    // --- 修炼逻辑 (全职位贡献) ---
+    // --- 修炼逻辑 (修复全职位贡献) ---
     async function doPractice() {
         const today = new Date().toISOString().split('T')[0];
-        if(me.daily_exp_count >= 2000 && me.last_practice_date === today) return alert("今日灵气已满");
+        if(me.daily_exp_count >= 2000 && me.last_practice_date === today) return alert("今日灵气已满，强行修炼恐有爆体之灾");
         
-        let add = me.companion_name ? 200 : 100;
-        let cAdd = me.sect ? 10 : 0; // 只要有宗门，全职位都加贡献
+        let addExp = me.companion_name ? 200 : 100; // 双修翻倍
+        let addContrib = me.sect ? 10 : 0; // 只要有宗门，全职位都加贡献
         
         const {data} = await _db.from('players').update({
-            exp: me.exp + add,
-            daily_exp_count: (me.last_practice_date === today ? me.daily_exp_count : 0) + add,
-            contribution: me.contribution + cAdd,
+            exp: me.exp + addExp,
+            daily_exp_count: (me.last_practice_date === today ? me.daily_exp_count : 0) + addExp,
+            contribution: me.contribution + addContrib,
             last_practice_date: today
         }).eq('id', me.id).select().single();
+        
         me = data; refreshUI();
     }
 
@@ -268,7 +307,12 @@
             document.getElementById('sect-none').style.display='block';
             document.getElementById('sect-hall').style.display='none';
             const {data} = await _db.from('sects').select('*');
-            document.getElementById('all-sects-list').innerHTML = data.map(s=>`<div>${s.name} <button class="btn-dark" onclick="joinSect('${s.name}')">加入</button></div>`).join('');
+            document.getElementById('all-sects-list').innerHTML = data.map(s=>`
+                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #222;">
+                    <span>${s.name} (宗主: ${s.master_name})</span>
+                    <button class="btn-sub" onclick="joinSect('${s.name}')">加入</button>
+                </div>
+            `).join('');
         } else {
             document.getElementById('sect-none').style.display='none';
             document.getElementById('sect-hall').style.display='block';
@@ -278,13 +322,17 @@
             if(me.sect_pos_level >= 5) document.getElementById('sect-admin-box').style.display='block';
             
             const {data} = await _db.from('players').select('name, sect_pos_level').eq('sect', me.sect);
-            document.getElementById('sect-members').innerHTML = data.map(m=>`<div>[${pNames[m.sect_pos_level]}] ${m.name}</div>`).join('');
+            document.getElementById('sect-members').innerHTML = data.map(m=>`
+                <div style="padding:5px 0; border-bottom:1px solid #1a1a1a; font-size:12px;">
+                    [${pNames[m.sect_pos_level]}] ${m.name}
+                </div>
+            `).join('');
         }
     }
 
     async function createSect() {
-        const n = document.getElementById('new-sect-n').value;
-        if(me.money < 5000) return alert("灵石不足");
+        const n = document.getElementById('new-sect-n').value.trim();
+        if(me.money < 5000) return alert("灵石不足，无法开宗");
         await _db.from('sects').insert([{name:n, master_name:me.name}]);
         const {data} = await _db.from('players').update({sect:n, sect_pos_level:5, money:me.money-5000}).eq('id', me.id).select().single();
         me = data; refreshUI();
@@ -296,6 +344,7 @@
     }
 
     async function quitSect() {
+        if(!confirm("确定要离开宗门吗？")) return;
         const {data} = await _db.from('players').update({sect:null, sect_pos_level:0}).eq('id', me.id).select().single();
         me = data; refreshUI();
     }
@@ -303,16 +352,19 @@
     // --- 聊天与百宝阁 ---
     function switchChat(m) {
         chatMode = m;
-        document.getElementById('t-world').classList.toggle('active', m==='WORLD');
-        document.getElementById('t-priv').classList.toggle('active', m==='PRIVATE');
+        document.getElementById('tab-world').classList.toggle('active', m==='WORLD');
+        document.getElementById('tab-priv').classList.toggle('active', m==='PRIVATE');
         loadMsgs();
     }
 
     async function sendMsg() {
-        const c = document.getElementById('chat-input').value;
+        const c = document.getElementById('chat-input').value.trim();
         let rev = 'WORLD';
-        if(chatMode === 'PRIVATE') rev = prompt("请输入对方道号");
-        if(!c || !rev) return;
+        if(chatMode === 'PRIVATE') {
+            rev = prompt("请输入对方道号");
+            if(!rev) return;
+        }
+        if(!c) return;
         await _db.from('messages').insert([{sender_name: me.name, receiver_name: rev, content: c}]);
         document.getElementById('chat-input').value = '';
     }
@@ -323,19 +375,19 @@
         else q = q.or(`sender_name.eq.${me.name},receiver_name.eq.${me.name}`).neq('receiver_name', 'WORLD');
         const {data} = await q;
         document.getElementById('msg-list').innerHTML = data.reverse().map(m=>`
-            <div class="msg-item">
-                <span class="msg-sender" onclick="openPrivate('${m.sender_name}')">${m.sender_name}${m.receiver_name!=='WORLD'?' -> '+m.receiver_name:''}:</span>
+            <div class="msg-bubble">
+                <span class="msg-user" onclick="setPrivate('${m.sender_name}')">${m.sender_name}${m.receiver_name!=='WORLD'?' -> '+m.receiver_name:''}:</span>
                 <span>${m.content}</span>
             </div>
         `).join('');
     }
 
-    // --- 主宰管理 (Ran专用) ---
+    // --- 主宰权能 (Ran 专属) ---
     async function adminCreateUser() {
-        const n = document.getElementById('adm-new-n').value;
-        const p = document.getElementById('adm-new-p').value;
-        await _db.from('players').insert([{name:n, password:p, qq_number: 'ADMIN_'+Date.now()}]);
-        alert("灵魂已点化");
+        const n = document.getElementById('adm-new-n').value.trim();
+        const p = document.getElementById('adm-new-p').value.trim();
+        await _db.from('players').insert([{name:n, password:p, qq_number: '天道降下_'+Date.now()}]);
+        alert("灵魂已点化入世");
     }
 
     async function adminReward(type) {
@@ -343,12 +395,12 @@
         if(type === 'all') {
             const {data:all} = await _db.from('players').select('id, money');
             for(let p of all) await _db.from('players').update({money: p.money + amt}).eq('id', p.id);
-            alert("普降雨露");
+            alert("天道普降雨露，众生皆得灵石");
         } else {
             const t = document.getElementById('adm-target').value;
             const {data} = await _db.from('players').select('money').eq('name', t).single();
             await _db.from('players').update({money: data.money + amt}).eq('name', t);
-            alert("已赐予");
+            alert("已赐予灵石");
         }
     }
 
@@ -356,40 +408,50 @@
         const t = document.getElementById('adm-target').value;
         if(type==='ban') await _db.from('players').update({is_banned: true}).eq('name', t);
         if(type==='del_sect') await _db.from('sects').delete().eq('name', t);
-        alert("敕令执行完毕");
+        alert("天道裁决已下达");
     }
 
     async function adminPostTask() {
         await _db.from('heaven_tasks').insert([{content: document.getElementById('adm-task-c').value}]);
-        alert("敕令已颁布");
+        alert("敕令已颁布"); loadTasks();
     }
 
-    // --- 杂项 ---
+    // --- 系统杂项 ---
     function navTo(p) {
         document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
         document.getElementById('p-'+p).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
         event.currentTarget.classList.add('active');
     }
 
     async function doCheckin() {
         const today = new Date().toISOString().split('T')[0];
-        if(me.last_checkin === today) return alert("今日已签到");
+        if(me.last_checkin === today) return alert("今日已签到请安");
         const {data} = await _db.from('players').update({money: me.money+500, last_checkin: today}).eq('id', me.id).select().single();
-        me = data; refreshUI(); alert("获得500灵石");
+        me = data; refreshUI(); alert("天道恩赐 500 灵石");
     }
 
     async function loadRank() {
         const {data} = await _db.from('players').select('name, exp').neq('name', 'Ran').order('exp', {ascending:false}).limit(10);
-        document.getElementById('rank-list').innerHTML = data.map((r,i)=>`<div>#${i+1} ${r.name} - ${r.exp}修为</div>`).join('');
+        document.getElementById('rank-list').innerHTML = data.map((r,i)=>`
+            <div style="padding:10px; border-bottom:1px solid #222; display:flex; justify-content:space-between;">
+                <span>#${i+1} ${r.name}</span>
+                <span style="color:var(--gold)">${r.exp} 修为</span>
+            </div>
+        `).join('');
     }
 
     async function loadTasks() {
         const {data} = await _db.from('heaven_tasks').select('*');
-        document.getElementById('task-list').innerHTML = data.map(t=>`<div>${t.content} <button class="btn-dark" onclick="doTask(${t.id})">领赏</button></div>`).join('');
+        document.getElementById('task-list').innerHTML = data.map(t=>`
+            <div style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span>${t.content}</span>
+                <button class="btn-sub" onclick="doTask(${t.id})">领赏</button>
+            </div>
+        `).join('');
     }
 
-    function startLive() {
+    function startRealtime() {
         _db.channel('any').on('postgres_changes', {event:'*', schema:'public'}, () => {
             loadMsgs(); loadRank();
         }).subscribe();
