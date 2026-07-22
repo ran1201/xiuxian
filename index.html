@@ -3,148 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ran的修仙世界</title>
+    <title>Ran的修仙宗门</title>
     <style>
         :root { --main-gold: #ffd700; --bg-dark: #121212; --card-bg: #1e1e1e; }
-        body { background: var(--bg-dark); color: #e0e0e0; font-family: 'STKaiti', 'serif'; text-align: center; margin: 0; padding-bottom: 50px; }
-        .header { background: linear-gradient(to bottom, #2c3e50, #000); padding: 30px 20px; border-bottom: 2px solid var(--main-gold); margin-bottom: 20px; }
-        .title { font-size: 2.2rem; color: var(--main-gold); text-shadow: 0 0 15px var(--main-gold); letter-spacing: 5px; }
+        body { background: var(--bg-dark); color: #e0e0e0; font-family: 'STKaiti', serif; margin: 0; padding-bottom: 50px; }
         .container { max-width: 600px; margin: auto; padding: 10px; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; position: relative; overflow: hidden; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 1.1rem; }
-        .stat-item { padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid #333; }
         .stat-value { color: var(--main-gold); font-weight: bold; }
-        .progress-container { margin: 15px 0; background: #333; height: 10px; border-radius: 5px; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #d4af37, #f9f295); width: 0%; transition: 0.5s; border-radius: 5px; }
-        .btn-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-        .btn { background: #2c3e50; border: 1px solid var(--main-gold); color: var(--main-gold); padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s; flex: 1; min-width: 120px; }
-        .btn:hover { background: var(--main-gold); color: #000; }
-        .shop-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; }
-        .partner-active { border: 2px solid #ff4757; background: rgba(255, 71, 87, 0.1); }
-        .log-box { height: 100px; overflow-y: auto; background: #000; padding: 10px; font-size: 0.85rem; color: #888; text-align: left; border-radius: 5px; }
+        .btn { background: #2c3e50; border: 1px solid var(--main-gold); color: var(--main-gold); padding: 8px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn:disabled { border-color: #555; color: #555; cursor: not-allowed; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .input-box { padding: 10px; border-radius: 5px; border: 1px solid var(--main-gold); background: #222; color: #fff; margin-bottom: 10px; width: 200px; text-align: center; }
+        .log-box { height: 120px; overflow-y: auto; background: #000; padding: 10px; font-size: 0.8rem; color: #888; text-align: left; border-radius: 5px; margin-top: 10px; border: 1px solid #333; }
+        .admin-tag { background: var(--main-gold); color: #000; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="title">✨ 天道主宰 · Ran ✨</div>
-    <div style="color: #aaa; margin-top: 10px;">凡尘归尽，在此成神</div>
+<!-- 登录界面 -->
+<div id="login-overlay">
+    <h2 style="color:var(--main-gold)">请输入道号</h2>
+    <input type="text" id="username-input" class="input-box" placeholder="你的修仙尊称">
+    <button class="btn" onclick="login()">踏入仙途</button>
+    <p style="font-size: 0.8rem; color: #666;">注：道号 'Ran' 为天道主宰</p>
 </div>
 
-<div class="container">
+<div class="container" id="main-ui" style="display:none">
     <div class="card">
-        <div class="stat-grid">
-            <div class="stat-item">境界: <span id="level" class="stat-value">凡人</span></div>
-            <div class="stat-item">灵石: <span id="money" class="stat-value">0</span></div>
-            <div class="stat-item">战力: <span id="power" class="stat-value">10</span></div>
-            <div class="stat-item">天赋: <span class="stat-value">天选之人</span></div>
+        <div style="font-size:1.2rem; margin-bottom:10px;">
+            <span id="display-name">修士</span>
+            <span id="role-tag"></span>
         </div>
-        <div class="progress-container"><div id="exp-bar" class="progress-bar"></div></div>
-        <div style="font-size: 0.9rem;">修为进度: <span id="exp">0</span> / <span id="next-exp">100</span></div>
-    </div>
-
-    <div class="card">
-        <div class="btn-group">
-            <button class="btn" onclick="action('train')">打坐闭关</button>
-            <button class="btn" onclick="action('explore')">外出历练</button>
-            <button class="btn" id="break-btn" style="display:none; color: #ff4757; border-color: #ff4757;" onclick="action('break')">渡劫飞升</button>
-        </div>
-    </div>
-
-    <!-- 商店系统 -->
-    <div class="card">
-        <div style="color:var(--main-gold); margin-bottom:10px;">📜 万宝阁</div>
-        <div class="shop-item">
-            <span>聚灵丹 (修为+50)</span>
-            <button class="btn" style="min-width: 60px; padding: 5px;" onclick="buy('dan')">50灵石</button>
-        </div>
-        <div class="shop-item">
-            <span>青锋剑 (战力+20)</span>
-            <button class="btn" style="min-width: 60px; padding: 5px;" onclick="buy('sword')">200灵石</button>
-        </div>
-    </div>
-
-    <!-- 双修系统 -->
-    <div class="card partner-active">
-        <div style="color:#ff4757; font-weight:bold; margin-bottom:10px;">💕 命定之人</div>
-        <div style="display:flex; align-items:center; gap: 15px;">
-            <div style="width:50px; height:50px; background:#444; border-radius:50%; line-height:50px;">陆</div>
-            <div style="text-align:left;">
-                <div style="color:#ff4757;">陆执 (忠诚度: ∞)</div>
-                <div style="font-size: 0.8rem; color: #aaa;">加成：双修效率 x 2.0</div>
-            </div>
-            <button class="btn" style="min-width: 80px; font-size:0.8rem;" onclick="action('couple')">合体修炼</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; text-align:left;">
+            <div>境界: <span id="level" class="stat-value">-</span></div>
+            <div>灵石: <span id="money" class="stat-value">0</span></div>
+            <div>今日余力: <span id="actions" class="stat-value">-</span></div>
+            <div>战力: <span id="power" class="stat-value">-</span></div>
         </div>
     </div>
 
     <div class="card">
-        <div class="log-box" id="log">
-            欢迎回到仙界，道友。
-        </div>
+        <div style="color:var(--main-gold); margin-bottom:10px;">💎 修炼中心</div>
+        <button class="btn" onclick="doAction('train')">打坐闭关</button>
+        <button class="btn" onclick="doAction('explore')">秘境寻宝</button>
+        <button class="btn" onclick="doAction('couple')">与陆执双修</button>
+    </div>
+
+    <!-- 转账功能 -->
+    <div class="card">
+        <div style="color:var(--main-gold); margin-bottom:10px;">📦 灵石传书 (转账)</div>
+        <div style="font-size:0.8rem; color:#888; margin-bottom:10px;">生成一个礼包码发给道友，或输入别人的码</div>
+        <input type="number" id="gift-amount" class="input-box" style="width:100px" placeholder="金额">
+        <button class="btn" onclick="createGift()">打包灵石</button>
+        <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
+        <input type="text" id="gift-code-input" class="input-box" style="width:180px" placeholder="输入礼包码">
+        <button class="btn" onclick="claimGift()">领取</button>
+    </div>
+
+    <div class="card">
+        <div class="log-box" id="log"></div>
+        <button class="btn" style="font-size:0.7rem; margin-top:10px; opacity:0.5;" onclick="resetData()">重修 (清空存档)</button>
     </div>
 </div>
 
 <script>
-    let state = {
-        exp: 0, nextExp: 100, money: 0, power: 10, levelIdx: 0,
-        levels: ["凡人", "炼气初期", "炼气中期", "炼气后期", "筑基初期", "筑基中期", "筑基后期", "结丹大能", "金丹圆满", "元婴期", "化神期"]
-    };
+    let user = { name: "", money: 0, exp: 0, levelIdx: 0, actions: 20, lastDate: "", power: 10 };
+    const levels = ["凡人", "炼气", "筑基", "金丹", "元婴", "化神", "渡劫", "大乘"];
+
+    function login() {
+        let name = document.getElementById('username-input').value.trim();
+        if (!name) return alert("请赐教道号");
+        user.name = name;
+        loadData();
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('main-ui').style.display = 'block';
+        document.getElementById('display-name').innerText = user.name;
+        if(user.name === 'Ran') {
+            document.getElementById('role-tag').innerHTML = '<span class="admin-tag">天道主宰</span>';
+        }
+        addLog(`欢迎回来，${user.name}。`);
+        update();
+    }
+
+    function loadData() {
+        let saved = localStorage.getItem('xiuxian_' + user.name);
+        if (saved) {
+            user = JSON.parse(saved);
+        }
+        // 每日刷新逻辑
+        let today = new Date().toDateString();
+        if (user.lastDate !== today) {
+            user.actions = 20;
+            user.lastDate = today;
+        }
+    }
+
+    function saveData() {
+        localStorage.setItem('xiuxian_' + user.name, JSON.stringify(user));
+    }
+
+    function update() {
+        document.getElementById('level').innerText = levels[user.levelIdx] || "仙尊";
+        document.getElementById('money').innerText = user.money;
+        document.getElementById('power').innerText = user.power;
+        document.getElementById('actions').innerText = (user.name === 'Ran') ? "无限" : user.actions;
+        saveData();
+    }
 
     function addLog(msg) {
         let log = document.getElementById('log');
         log.innerHTML = `> ${msg}<br>${log.innerHTML}`;
     }
 
-    function action(type) {
-        if(type === 'train') {
-            let gain = (5 + state.levelIdx * 2);
-            state.exp += gain;
-            addLog(`你在洞府中打坐，获得了 ${gain} 点修为。`);
-        } else if(type === 'explore') {
-            let m = Math.floor(Math.random() * 30) + 10;
-            state.money += m;
-            state.exp += 2;
-            addLog(`你在秘境中寻得灵石 ${m} 枚。`);
-        } else if(type === 'couple') {
-            let gain = (10 + state.levelIdx * 5) * 2;
-            state.exp += gain;
-            addLog(`你与陆执共鸣神魂，修为暴涨 ${gain} 点。`);
-        } else if(type === 'break') {
-            state.levelIdx++;
-            state.exp = 0;
-            state.nextExp = Math.floor(state.nextExp * 2.5);
-            state.power += 50;
-            addLog(`天降祥瑞！你已成功晋升至 ${state.levels[state.levelIdx]}！`);
+    function doAction(type) {
+        if (user.name !== 'Ran' && user.actions <= 0) {
+            return addLog("<span style='color:red'>今日神识耗尽，请明日再来。</span>");
+        }
+
+        if (type === 'train') {
+            user.exp += 10;
+            addLog("深山苦修，修为微增。");
+        } else if (type === 'explore') {
+            let m = Math.floor(Math.random() * 20);
+            user.money += m;
+            addLog(`秘境探险，获得灵石 ${m}。`);
+        } else if (type === 'couple') {
+            user.exp += 50;
+            addLog("与陆执灵肉合一，修为一日千里！");
+        }
+
+        if (user.name !== 'Ran') user.actions--;
+        
+        // 简易升级
+        if (user.exp >= (user.levelIdx + 1) * 100) {
+            user.levelIdx++;
+            user.exp = 0;
+            user.power += 100;
+            addLog(`⭐ 恭喜突破至 ${levels[user.levelIdx]}！`);
         }
         update();
     }
 
-    function buy(item) {
-        if(item === 'dan' && state.money >= 50) {
-            state.money -= 50;
-            state.exp += 50;
-            addLog("吞服聚灵丹，修为增加了 50 点。");
-        } else if(item === 'sword' && state.money >= 200) {
-            state.money -= 200;
-            state.power += 20;
-            addLog("装备青锋剑，战力大幅提升！");
-        } else {
-            addLog("囊中羞涩，再去赚些灵石吧。");
+    // 转账系统：生成礼包码
+    function createGift() {
+        let amt = parseInt(document.getElementById('gift-amount').value);
+        if (isNaN(amt) || amt <= 0 || (user.name !== 'Ran' && amt > user.money)) {
+            return alert("灵石不足或输入有误");
         }
+        if (user.name !== 'Ran') user.money -= amt;
+        // 生成一个简单的 base64 礼包码
+        let code = btoa(`GIFT|${amt}|${Date.now()}|${Math.random()}`);
+        addLog(`生成礼包码成功（扣除${amt}灵石）：<br><b style="color:var(--main-gold)">${code}</b><br>请复制发给道友。`);
         update();
     }
 
-    function update() {
-        document.getElementById('level').innerText = state.levels[state.levelIdx];
-        document.getElementById('money').innerText = state.money;
-        document.getElementById('exp').innerText = Math.floor(state.exp);
-        document.getElementById('next-exp').innerText = state.nextExp;
-        document.getElementById('power').innerText = state.power;
-        
-        let percent = (state.exp / state.nextExp) * 100;
-        document.getElementById('exp-bar').style.width = Math.min(percent, 100) + "%";
-        
-        document.getElementById('break-btn').style.display = state.exp >= state.nextExp ? "inline-block" : "none";
+    // 转账系统：领取礼包码
+    function claimGift() {
+        let code = document.getElementById('gift-code-input').value.trim();
+        try {
+            let decoded = atob(code).split('|');
+            if (decoded[0] === 'GIFT') {
+                let amt = parseInt(decoded[1]);
+                user.money += amt;
+                addLog(`领取礼包成功，获得灵石 ${amt}！`);
+                document.getElementById('gift-code-input').value = "";
+                update();
+            }
+        } catch(e) {
+            alert("无效的礼包码");
+        }
+    }
+
+    function resetData() {
+        if(confirm("确定要散尽修为重来吗？")) {
+            localStorage.removeItem('xiuxian_' + user.name);
+            location.reload();
+        }
     }
 </script>
 </body>
